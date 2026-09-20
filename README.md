@@ -1,40 +1,100 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# ⚡ oneNexus Studio — Digital Experience & Engineering Platform
 
-## Getting Started
+[![Next.js](https://img.shields.io/badge/Next.js-16.3-black?style=for-the-badge&logo=next.js)](https://nextjs.org)
+[![Three.js](https://img.shields.io/badge/Three.js-R3F-blue?style=for-the-badge&logo=three.js)](https://threejs.org)
+[![GSAP](https://img.shields.io/badge/GSAP-3.15-green?style=for-the-badge&logo=greensock)](https://greensock.com)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 
-First, run the development server:
+An Awwwards-level digital agency platform and interactive client discovery portal for **oneNexus Studio** — a founder-led strategic design and engineering firm connecting brand strategy, 3D web graphics, and high-performance digital products.
+
+---
+
+## ✨ Core Highlights & Key Features
+
+### 🎨 1. Interactive 3D GLTF Scene (`Contact3DScene.tsx`)
+* **Dynamic 3D Geometry**: Renders `/models/3d_scene_for_onenexus.gltf` with `@react-three/fiber` and `@react-three/drei`.
+* **Cinematic Breathing & Parallax**: Real-time camera breathing combined with subtle mouse parallax depth.
+* **Vibrant Brand Palette Materials**: Customized MeshStandardMaterials with Cobalt Blue (`#2554E8`), Electric Cyan (`#0EA5E9`), and Indigo (`#6366F1`) glowing emissive highlights.
+* **100% Offline Local Studio Lighting**: Multi-directional lighting rig operating completely local with zero CDN external asset dependencies.
+
+### 📋 2. Step-by-Step Discovery Questionnaire (`/contact`)
+* **Strategic Client Onboarding**: 5-step guided project discovery wizard asking targeted questions (Profile, Scope, Goals, Budget, Brief).
+* **Progress Telemetry Tracker**: Real-time percentage progress bar and completed step navigation pills.
+* **Dynamic Ticket Receipt**: Generates a unique inquiry code (e.g. `NEX-L83F91A-4921`) with full summary breakdown upon completion.
+
+### 🎯 3. Telemetry HUD Custom Cursor (`CustomCursor.tsx`)
+* **Real-time Coordinate Tracking**: Monospace X/Y telemetry HUD floating smoothly alongside cursor.
+* **Interactive Reticle Corners**: 4 corner L-brackets that expand into a focused target reticle with dynamic action badges (`START ↗`, `SELECT`, `COPY`) when hovering over interactive elements.
+* **Click Shockwave**: Concentric animated ring ripple wave on click.
+
+### 🧭 4. Smart Auto-Hiding Navbar (`Navbar.tsx`)
+* **Scroll-Direction Awareness**: Smoothly translates upward out of view (`-translate-y-full`) on scroll-down, and reveals instantly (`translate-y-0`) on scroll-up.
+* **Warm Cream Brand Palette (`#EFECE6`)**: Translucent backdrop-blur header styled to match the studio's signature warm cream aesthetic.
+
+### 📧 5. Production Nodemailer API Engine (`/api/contact.ts`)
+* **Automated Email Dispatch**: Sends luxury HTML email templates with client brief summaries directly to studio founders.
+* **Zero-Config Setup**: Works with Gmail App Passwords, custom SMTP servers, or Resend API key fallback.
+
+---
+
+## 🛠️ Tech Stack & Architecture
+
+* **Framework**: Next.js 16 (Pages Router, Turbopack) & React 19
+* **3D Engine**: Three.js, React Three Fiber (`@react-three/fiber`), `@react-three/drei`
+* **Animations**: GSAP (GreenSock), Framer Motion
+* **Styling**: TailwindCSS, Vanilla CSS, Lucide Icons
+* **Email Dispatch**: Nodemailer, Next.js API Routes
+
+---
+
+## 🚀 Getting Started
+
+### 1. Prerequisites
+Ensure you have Node.js 18+ installed on your machine.
+
+### 2. Installation
+Clone the repository and install dependencies:
+
+```bash
+git clone https://github.com/Hemanth-konduri/onenexus.git
+cd onenexus
+npm install
+```
+
+### 3. Environment Variables Setup (`.env.local`)
+Create a `.env.local` file in the root directory and configure your email credentials:
+
+```env
+# SMTP Configuration (Gmail App Password or Custom SMTP)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=465
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-16-char-app-password
+CONTACT_NOTIFICATION_EMAIL=hello@onenexus.studio
+```
+
+### 4. Run Development Server
+Start the local development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+---
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+## 📦 Production Build & Deployment
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+To verify TypeScript compilation and create an optimized production build:
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm run start
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 📄 License
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+Copyright © 2026 **oneNexus Studio**. All rights reserved.
