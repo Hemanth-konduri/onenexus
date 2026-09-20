@@ -163,7 +163,12 @@ export default function Contact() {
           {/* Col 1: Studio Identity (4 cols) */}
           <div className="footer-col lg:col-span-4 flex flex-col justify-between">
             <div>
-              <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center gap-3 mb-4">
+                <img
+                  src="/onenexus-logo-bckgr.png"
+                  alt="oneNexus Studio"
+                  className="h-9 w-auto object-contain rounded-[2px]"
+                />
                 <span className="font-sans font-black text-2xl text-white tracking-tighter uppercase">
                   oneNexus
                 </span>

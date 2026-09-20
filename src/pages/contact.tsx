@@ -216,6 +216,8 @@ export default function ContactPage() {
           content="Start a conversation with oneNexus. Complete our step-by-step strategic project discovery questionnaire to partner directly with studio founders."
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/onenexus-logo-bckgrpng" />
+        <link rel="apple-touch-icon" href="/onenexus-logo-bckgr.png" />
       </Head>
 
       <CustomCursor />
@@ -251,8 +253,12 @@ export default function ContactPage() {
             </Link>
 
             {/* Brand Logo */}
-            <Link href="/" className="flex items-center gap-2.5">
-              <span className="w-2.5 h-2.5 bg-[#2554E8] rounded-[1px]" />
+            <Link href="/" className="flex items-center gap-3 group">
+              <img
+                src="/onenexus-logo-bckgr.png"
+                alt="oneNexus Studio"
+                className="h-8 sm:h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+              />
               <span className="font-sans font-bold tracking-tight text-xl text-[#111827]">
                 one<span className="text-[#2554E8]">Nexus</span>
               </span>

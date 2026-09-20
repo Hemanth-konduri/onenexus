@@ -51,9 +51,13 @@ export default function Navbar() {
         }`}
       >
         <div className="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 flex items-center justify-between">
-          {/* Brand Logo & Square Accent */}
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-2.5 h-2.5 bg-[#2554E8] rounded-[1px] transition-transform duration-300 group-hover:scale-125" />
+          {/* Brand Logo */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <img
+              src="/onenexus-logo-bckgr.png"
+              alt="oneNexus Studio"
+              className="h-8 sm:h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+            />
             <span className="font-sans font-black tracking-tight text-xl text-[#111827]">
               one<span className="text-[#2554E8]">Nexus</span>
             </span>

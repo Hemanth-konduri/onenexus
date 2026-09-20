@@ -18,7 +18,8 @@ export default function Home() {
           content="A founder-led strategic design studio connecting strategy, brand and digital products."
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/onenexus-logo-bckgr.png" />
+        <link rel="apple-touch-icon" href="/onenexus-logo-bckgr.png" />
       </Head>
 
       {/* Global Interactive Custom Cursor */}
