@@ -7,6 +7,7 @@ import Proof from "@/components/Proof";
 import FAQ from "@/components/FAQ";
 import Contact from "@/components/Contact";
 import CustomCursor from "@/components/CustomCursor";
+import Preloader from "@/components/Preloader";
 
 export default function Home() {
   return (
@@ -21,6 +22,9 @@ export default function Home() {
         <link rel="icon" href="/onenexus-logo-bckgr.png" />
         <link rel="apple-touch-icon" href="/onenexus-logo-bckgr.png" />
       </Head>
+
+      {/* Animated Studio Initializer Preloader */}
+      <Preloader />
 
       {/* Global Interactive Custom Cursor */}
       <CustomCursor />
