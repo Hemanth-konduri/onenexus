@@ -1,15 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function CustomCursor() {
-  const [mousePosition, setMousePosition] = useState({ x: -100, y: -100 });
+  const [mousePos, setMousePos] = useState({ x: -100, y: -100 });
+  const [velocity, setVelocity] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
-  const [hoverText, setHoverText] = useState("INTERACT");
+  const [hoverLabel, setHoverLabel] = useState("");
   const [isClicked, setIsClicked] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
+  const prevMouseRef = useRef({ x: -100, y: -100 });
+
   useEffect(() => {
-    // Hide default cursor on desktop devices
+    // Only initialize on desktop pointer devices
     if (typeof window === "undefined") return;
     if (window.matchMedia("(pointer: coarse)").matches) return;
 
@@ -17,12 +20,17 @@ export default function CustomCursor() {
     document.body.classList.add("custom-cursor-active");
 
     const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
+      const vx = e.clientX - prevMouseRef.current.x;
+      const vy = e.clientY - prevMouseRef.current.y;
+      prevMouseRef.current = { x: e.clientX, y: e.clientY };
+
+      setMousePos({ x: e.clientX, y: e.clientY });
+      setVelocity({ x: vx, y: vy });
     };
 
     const handleMouseDown = () => {
       setIsClicked(true);
-      setTimeout(() => setIsClicked(false), 300);
+      setTimeout(() => setIsClicked(false), 250);
     };
 
     const handleMouseOver = (e: MouseEvent) => {
@@ -34,23 +42,26 @@ export default function CustomCursor() {
         target.closest("button") ||
         target.closest("a") ||
         target.getAttribute("role") === "button" ||
-        target.classList.contains("cursor-pointer");
+        target.classList.contains("cursor-pointer") ||
+        target.closest(".work-card");
 
       if (interactiveEl) {
         setIsHovered(true);
-        // Determine dynamic action text based on content
-        const textContent = (target.textContent || "").toLowerCase();
-        if (textContent.includes("project") || textContent.includes("initiate")) {
-          setHoverText("START ↗");
-        } else if (textContent.includes("return") || textContent.includes("back")) {
-          setHoverText("RETURN ↖");
-        } else if (textContent.includes("copy")) {
-          setHoverText("COPY");
+        const text = (target.textContent || "").toLowerCase();
+        if (text.includes("project") || text.includes("start") || text.includes("initiate")) {
+          setHoverLabel("INITIATE ↗");
+        } else if (text.includes("return") || text.includes("back")) {
+          setHoverLabel("RETURN ↖");
+        } else if (text.includes("copy")) {
+          setHoverLabel("COPY");
+        } else if (target.closest(".work-card")) {
+          setHoverLabel("VIEW ↗");
         } else {
-          setHoverText("SELECT");
+          setHoverLabel("SELECT");
         }
       } else {
         setIsHovered(false);
+        setHoverLabel("");
       }
     };
 
@@ -68,83 +79,53 @@ export default function CustomCursor() {
 
   if (!isVisible) return null;
 
+  // Fluid velocity calculation for dynamic chameleon morphing
+  const speed = Math.min(Math.sqrt(velocity.x ** 2 + velocity.y ** 2), 45);
+  const angle = Math.atan2(velocity.y, velocity.x) * (180 / Math.PI);
+  const stretchX = 1 + speed * 0.015;
+  const stretchY = Math.max(1 - speed * 0.01, 0.65);
+
   return (
     <div className="fixed inset-0 pointer-events-none z-[99999] overflow-hidden">
-      {/* 1. Micro HUD Coordinate Telemetry Label */}
+      {/* 1. Chameleon Adaptive Fluid Outer Lens (mix-blend-difference) */}
       <motion.div
-        className="fixed top-0 left-0 flex items-center gap-1.5 font-mono text-[9px] font-bold text-[#2554E8] tracking-widest uppercase select-none opacity-60"
+        className="fixed top-0 left-0 bg-white rounded-full pointer-events-none mix-blend-difference flex items-center justify-center"
         animate={{
-          x: mousePosition.x + 18,
-          y: mousePosition.y + 18,
-          opacity: isHovered ? 0.9 : 0.4,
+          x: mousePos.x - (isHovered ? 38 : 13),
+          y: mousePos.y - (isHovered ? 38 : 13),
+          width: isHovered ? 76 : 26,
+          height: isHovered ? 76 : 26,
+          scaleX: isHovered ? 1 : isClicked ? 0.7 : stretchX,
+          scaleY: isHovered ? 1 : isClicked ? 0.7 : stretchY,
+          rotate: isHovered ? 0 : angle,
         }}
-        transition={{ type: "spring", stiffness: 800, damping: 45 }}
+        transition={{ type: "spring", stiffness: 550, damping: 30, mass: 0.4 }}
       >
-        <span className="w-1 h-1 rounded-full bg-[#2554E8] animate-pulse" />
-        <span>
-          [{mousePosition.x.toString().padStart(4, "0")}:{mousePosition.y.toString().padStart(4, "0")}]
-        </span>
-      </motion.div>
-
-      {/* 2. Precision Central Laser Core Dot */}
-      <motion.div
-        className="fixed top-0 left-0 w-2.5 h-2.5 bg-[#2554E8] rounded-full pointer-events-none shadow-[0_0_12px_#2554E8]"
-        animate={{
-          x: mousePosition.x - 5,
-          y: mousePosition.y - 5,
-          scale: isHovered ? 0.5 : isClicked ? 1.8 : 1,
-        }}
-        transition={{ type: "spring", stiffness: 1200, damping: 60 }}
-      />
-
-      {/* 3. Innovative Reticle Frame & Dynamic Hover Badge */}
-      <motion.div
-        className="fixed top-0 left-0 flex items-center justify-center pointer-events-none border border-[#2554E8]/40 bg-[#2554E8]/[0.03] backdrop-blur-[1px]"
-        animate={{
-          x: mousePosition.x - (isHovered ? 40 : 20),
-          y: mousePosition.y - (isHovered ? 20 : 20),
-          width: isHovered ? 80 : 40,
-          height: isHovered ? 40 : 40,
-          borderRadius: isHovered ? 4 : 20,
-          borderColor: isHovered ? "rgba(37, 84, 232, 0.9)" : "rgba(37, 84, 232, 0.35)",
-          scale: isClicked ? 0.85 : 1,
-        }}
-        transition={{ type: "spring", stiffness: 450, damping: 32 }}
-      >
-        {/* Reticle Corner Marks (L-Brackets) */}
-        <span className="absolute -top-1 -left-1 w-1.5 h-1.5 border-t-2 border-l-2 border-[#2554E8]" />
-        <span className="absolute -top-1 -right-1 w-1.5 h-1.5 border-t-2 border-r-2 border-[#2554E8]" />
-        <span className="absolute -bottom-1 -left-1 w-1.5 h-1.5 border-b-2 border-l-2 border-[#2554E8]" />
-        <span className="absolute -bottom-1 -right-1 w-1.5 h-1.5 border-b-2 border-r-2 border-[#2554E8]" />
-
-        {/* Dynamic Action Text Badge */}
+        {/* Dynamic Action Text Label inside Chameleon Lens */}
         <AnimatePresence>
-          {isHovered && (
+          {isHovered && hoverLabel && (
             <motion.span
-              initial={{ opacity: 0, scale: 0.8 }}
+              initial={{ opacity: 0, scale: 0.6 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              className="font-mono text-[10px] font-black tracking-widest text-[#2554E8] uppercase select-none"
+              exit={{ opacity: 0, scale: 0.6 }}
+              className="font-mono text-[9px] font-black tracking-widest text-black uppercase select-none text-center px-1"
             >
-              {hoverText}
+              {hoverLabel}
             </motion.span>
           )}
         </AnimatePresence>
       </motion.div>
 
-      {/* 4. Click Shockwave Wave Pulse */}
-      <AnimatePresence>
-        {isClicked && (
-          <motion.div
-            initial={{ opacity: 1, scale: 0.5 }}
-            animate={{ opacity: 0, scale: 3.5 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            className="fixed top-0 left-0 w-10 h-10 -ml-5 -mt-5 rounded-full border-2 border-[#2554E8] pointer-events-none"
-            style={{ x: mousePosition.x, y: mousePosition.y }}
-          />
-        )}
-      </AnimatePresence>
+      {/* 2. Precision Laser Core Dot */}
+      <motion.div
+        className="fixed top-0 left-0 w-1.5 h-1.5 bg-white rounded-full pointer-events-none mix-blend-difference"
+        animate={{
+          x: mousePos.x - 3,
+          y: mousePos.y - 3,
+          scale: isHovered ? 0 : 1,
+        }}
+        transition={{ type: "spring", stiffness: 1200, damping: 60 }}
+      />
     </div>
   );
 }

@@ -163,16 +163,18 @@ export default function Contact() {
           {/* Col 1: Studio Identity (4 cols) */}
           <div className="footer-col lg:col-span-4 flex flex-col justify-between">
             <div>
-              <div className="flex items-center gap-3 mb-4">
-                <img
-                  src="/onenexus-logo-bckgr.png"
-                  alt="oneNexus Studio"
-                  className="h-9 w-auto object-contain rounded-[2px]"
-                />
-                <span className="font-sans font-black text-2xl text-white tracking-tighter uppercase">
+              <div className="flex items-center gap-3 mb-4 group cursor-pointer">
+                <div className="relative overflow-hidden rounded-[2px] p-0.5 transition-all duration-500 group-hover:shadow-[0_0_20px_rgba(37,84,232,0.6)]">
+                  <img
+                    src="/onenexus-logo-bckgr.png"
+                    alt="oneNexus Studio"
+                    className="h-9 w-auto object-contain transition-all duration-500 group-hover:scale-105 group-hover:brightness-125"
+                  />
+                </div>
+                <span className="font-sans font-black text-2xl text-white tracking-tighter uppercase group-hover:text-[#2554E8] transition-colors duration-300">
                   oneNexus
                 </span>
-                <span className="px-2 py-0.5 bg-[#2554E8] text-white font-mono text-[10px] font-bold tracking-widest uppercase">
+                <span className="px-2 py-0.5 bg-[#2554E8] text-white font-mono text-[10px] font-bold tracking-widest uppercase group-hover:bg-white group-hover:text-[#111827] transition-all duration-300">
                   STUDIO
                 </span>
               </div>

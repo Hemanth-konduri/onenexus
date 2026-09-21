@@ -252,15 +252,17 @@ export default function ContactPage() {
               <span>RETURN TO STUDIO</span>
             </Link>
 
-            {/* Brand Logo */}
+            {/* Chameleon Adaptive Brand Logo */}
             <Link href="/" className="flex items-center gap-3 group">
-              <img
-                src="/onenexus-logo-bckgr.png"
-                alt="oneNexus Studio"
-                className="h-8 sm:h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
-              />
-              <span className="font-sans font-bold tracking-tight text-xl text-[#111827]">
-                one<span className="text-[#2554E8]">Nexus</span>
+              <div className="relative overflow-hidden rounded-[4px] p-0.5 transition-all duration-500 group-hover:shadow-[0_0_20px_rgba(37,84,232,0.4)]">
+                <img
+                  src="/onenexus-logo-bckgr.png"
+                  alt="oneNexus Studio"
+                  className="h-8 sm:h-9 w-auto object-contain transition-all duration-500 group-hover:scale-105 group-hover:brightness-110"
+                />
+              </div>
+              <span className="font-sans font-bold tracking-tight text-xl text-[#111827] group-hover:text-[#2554E8] transition-colors duration-300">
+                one<span className="text-[#2554E8] group-hover:text-[#111827]">Nexus</span>
               </span>
             </Link>
 
