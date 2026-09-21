@@ -1,67 +1,101 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import gsap from "gsap";
 
-export default function Preloader({ onComplete }: { onComplete?: () => void }) {
-  const [progress, setProgress] = useState(0);
-  const [statusText, setStatusText] = useState("INITIALIZING STUDIO CORE...");
+type PreloaderProps = {
+  onComplete?: () => void;
+};
+
+export default function Preloader({ onComplete }: PreloaderProps) {
   const [isLoading, setIsLoading] = useState(true);
+  const preloaderRef = useRef<HTMLDivElement>(null);
+  const lettersRef = useRef<HTMLSpanElement[]>([]);
 
   useEffect(() => {
-    // Lock body scroll during preloading
+    // Lock body scrolling during preloading
+    const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
-    // Progress counter simulation (0 to 100%)
-    const duration = 2200; // 2.2 seconds total load time
-    const intervalTime = 30;
-    const steps = duration / intervalTime;
-    let currentStep = 0;
+    const letters = lettersRef.current.filter(Boolean);
 
-    const timer = setInterval(() => {
-      currentStep++;
-      const currentProgress = Math.min(Math.round((currentStep / steps) * 100), 100);
-      setProgress(currentProgress);
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        onComplete: () => {
+          setTimeout(() => {
+            setIsLoading(false);
+            document.body.style.overflow = previousOverflow;
+            onComplete?.();
+          }, 350);
+        },
+      });
 
-      // Update telemetry text based on progress milestone
-      if (currentProgress < 30) {
-        setStatusText("INITIALIZING STUDIO CORE...");
-      } else if (currentProgress < 60) {
-        setStatusText("CALIBRATING 3D SHADERS & LIGHTING...");
-      } else if (currentProgress < 88) {
-        setStatusText("COMPOSING ARCHITECTURAL GRID...");
-      } else if (currentProgress < 100) {
-        setStatusText("FINALIZING EXPERIENCE...");
-      } else {
-        setStatusText("WELCOME TO ONE NEXUS STUDIO");
-      }
+      // 1. Initial State: Letters are faint/dim outlines in 3D perspective
+      gsap.set(letters, {
+        opacity: 0.15,
+        color: "#334155",
+        rotateX: -90,
+        y: 40,
+        transformPerspective: 1000,
+        transformOrigin: "50% 50% -40px",
+      });
 
-      if (currentProgress >= 100) {
-        clearInterval(timer);
-        setTimeout(() => {
-          setIsLoading(false);
-          document.body.style.overflow = "";
-          if (onComplete) onComplete();
-        }, 400);
-      }
-    }, intervalTime);
+      // 2. Letter-by-letter 3D Flip & Illumination Fill
+      tl.to(letters, {
+        opacity: 1,
+        color: "#FFFFFF",
+        rotateX: 0,
+        y: 0,
+        duration: 0.75,
+        stagger: 0.12,
+        ease: "back.out(1.7)",
+      })
+      // 3. Highlight 'NEXUS' in Cobalt Blue letter-by-letter
+      .to(
+        letters.slice(3), // NEXUS letters
+        {
+          color: "#2554E8",
+          textShadow: "0 0 35px rgba(37, 84, 232, 0.85)",
+          duration: 0.5,
+          stagger: 0.08,
+          ease: "power2.out",
+        },
+        "-=0.3"
+      )
+      // 4. Smooth 360-degree rotation wave across letters
+      .to(
+        letters,
+        {
+          rotateY: 360,
+          duration: 1.1,
+          stagger: 0.06,
+          ease: "power2.inOut",
+        },
+        "+=0.15"
+      );
+
+    }, preloaderRef);
 
     return () => {
-      clearInterval(timer);
-      document.body.style.overflow = "";
+      ctx.revert();
+      document.body.style.overflow = previousOverflow;
     };
   }, [onComplete]);
+
+  const letterArray = ["O", "N", "E", "N", "E", "X", "U", "S"];
 
   return (
     <AnimatePresence mode="wait">
       {isLoading && (
         <motion.div
           key="preloader"
+          ref={preloaderRef}
           initial={{ y: 0 }}
           exit={{ y: "-100%" }}
           transition={{ duration: 0.85, ease: [0.76, 0, 0.24, 1] }}
-          className="fixed inset-0 z-[999999] bg-[#111827] text-white flex flex-col justify-between p-8 sm:p-14 lg:p-20 overflow-hidden select-none"
+          className="fixed inset-0 z-[999999] bg-[#0B0F17] text-white flex flex-col justify-between p-8 sm:p-14 lg:p-20 overflow-hidden select-none"
         >
-          {/* Architectural Background Grid Lines */}
-          <div className="absolute inset-0 pointer-events-none z-0 flex justify-between max-w-[1700px] mx-auto px-4 sm:px-8 lg:px-12 opacity-40">
+          {/* Background Architectural Grid Lines */}
+          <div className="absolute inset-0 pointer-events-none flex justify-between max-w-[1700px] mx-auto px-4 sm:px-8 lg:px-12 opacity-25">
             {[...Array(7)].map((_, i) => (
               <div
                 key={i}
@@ -70,49 +104,38 @@ export default function Preloader({ onComplete }: { onComplete?: () => void }) {
             ))}
           </div>
 
-          {/* Top Header Row */}
+          {/* Top Header */}
           <div className="relative z-10 flex items-center justify-between border-b border-white/10 pb-6">
-            <div className="flex items-center gap-3">
-              <img
-                src="/onenexus-logo-bckgr.png"
-                alt="oneNexus Studio"
-                className="h-7 sm:h-9 w-auto object-contain rounded-[2px]"
-              />
-              <span className="font-sans font-black text-xl sm:text-2xl tracking-tighter uppercase text-white">
-                one<span className="text-[#2554E8]">Nexus</span>
-              </span>
-            </div>
-            <span className="font-mono text-xs sm:text-sm text-neutral-400 tracking-widest uppercase font-bold">
-              [ STUDIO INITIALIZER ]
+            <span className="font-mono text-xs sm:text-sm text-[#2554E8] tracking-[0.25em] font-bold uppercase flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#2554E8] animate-ping" />
+              <span>[ STUDIO INITIALIZER ]</span>
+            </span>
+            <span className="font-mono text-xs text-neutral-400 tracking-widest uppercase font-bold">
+              ONE NEXUS STUDIO
             </span>
           </div>
 
-          {/* Center Main Counter & Progress Bar */}
-          <div className="relative z-10 max-w-4xl mx-auto w-full my-auto text-center py-10">
-            <div className="font-mono text-xs sm:text-sm text-[#2554E8] font-extrabold uppercase tracking-[0.25em] mb-4 flex items-center justify-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#2554E8] animate-ping" />
-              <span>{statusText}</span>
-            </div>
-
-            {/* Giant Monospace Percentage Display */}
-            <div className="font-mono text-7xl sm:text-9xl lg:text-[160px] font-black tracking-tighter leading-none text-white my-2">
-              {progress.toString().padStart(2, "0")}
-              <span className="text-[#2554E8] text-4xl sm:text-6xl lg:text-8xl">%</span>
-            </div>
-
-            {/* Cobalt Progress Line */}
-            <div className="w-full h-1.5 bg-white/10 overflow-hidden rounded-none mt-8 max-w-xl mx-auto border border-white/10">
-              <div
-                className="h-full bg-[#2554E8] transition-all duration-100 ease-out shadow-[0_0_12px_#2554E8]"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
+          {/* GIANT TYPOGRAPHY: ONENEXUS LETTER BY LETTER GSAP ANIMATION */}
+          <div className="relative z-10 my-auto text-center perspective-[1200px]">
+            <h1 className="font-sans font-black text-6xl sm:text-9xl lg:text-[140px] xl:text-[180px] tracking-tight uppercase leading-none select-none flex items-center justify-center gap-1 sm:gap-2 lg:gap-4">
+              {letterArray.map((letter, index) => (
+                <span
+                  key={index}
+                  ref={(el) => {
+                    if (el) lettersRef.current[index] = el;
+                  }}
+                  className="inline-block transition-colors duration-300"
+                >
+                  {letter}
+                </span>
+              ))}
+            </h1>
           </div>
 
           {/* Bottom Telemetry Info */}
-          <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between border-t border-white/10 pt-6 gap-4 font-mono text-xs text-neutral-400">
-            <div>ONE NEXUS STUDIO • MAYFAIR LONDON</div>
-            <div className="text-white font-bold tracking-widest">
+          <div className="relative z-10 flex items-center justify-between border-t border-white/10 pt-6 font-mono text-xs text-neutral-400">
+            <div>MAYFAIR LONDON • MANHATTAN NEW YORK</div>
+            <div className="text-[#2554E8] font-bold uppercase tracking-widest">
               STRATEGIC DESIGN & ENGINEERING
             </div>
           </div>
