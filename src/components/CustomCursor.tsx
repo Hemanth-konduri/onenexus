@@ -1,11 +1,10 @@
 import { useEffect, useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 export default function CustomCursor() {
   const [mousePos, setMousePos] = useState({ x: -100, y: -100 });
   const [velocity, setVelocity] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
-  const [hoverLabel, setHoverLabel] = useState("");
   const [isClicked, setIsClicked] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -30,7 +29,7 @@ export default function CustomCursor() {
 
     const handleMouseDown = () => {
       setIsClicked(true);
-      setTimeout(() => setIsClicked(false), 250);
+      setTimeout(() => setIsClicked(false), 200);
     };
 
     const handleMouseOver = (e: MouseEvent) => {
@@ -47,21 +46,8 @@ export default function CustomCursor() {
 
       if (interactiveEl) {
         setIsHovered(true);
-        const text = (target.textContent || "").toLowerCase();
-        if (text.includes("project") || text.includes("start") || text.includes("initiate")) {
-          setHoverLabel("INITIATE ↗");
-        } else if (text.includes("return") || text.includes("back")) {
-          setHoverLabel("RETURN ↖");
-        } else if (text.includes("copy")) {
-          setHoverLabel("COPY");
-        } else if (target.closest(".work-card")) {
-          setHoverLabel("VIEW ↗");
-        } else {
-          setHoverLabel("SELECT");
-        }
       } else {
         setIsHovered(false);
-        setHoverLabel("");
       }
     };
 
@@ -79,44 +65,30 @@ export default function CustomCursor() {
 
   if (!isVisible) return null;
 
-  // Fluid velocity calculation for dynamic chameleon morphing
-  const speed = Math.min(Math.sqrt(velocity.x ** 2 + velocity.y ** 2), 45);
+  // Fluid velocity calculation for smooth stretch
+  const speed = Math.min(Math.sqrt(velocity.x ** 2 + velocity.y ** 2), 40);
   const angle = Math.atan2(velocity.y, velocity.x) * (180 / Math.PI);
   const stretchX = 1 + speed * 0.015;
-  const stretchY = Math.max(1 - speed * 0.01, 0.65);
+  const stretchY = Math.max(1 - speed * 0.01, 0.7);
 
   return (
     <div className="fixed inset-0 pointer-events-none z-[99999] overflow-hidden">
-      {/* 1. Chameleon Adaptive Fluid Outer Lens (mix-blend-difference) */}
+      {/* 1. Pure Minimalist Chameleon Disc (mix-blend-difference, zero blocking text) */}
       <motion.div
-        className="fixed top-0 left-0 bg-white rounded-full pointer-events-none mix-blend-difference flex items-center justify-center"
+        className="fixed top-0 left-0 bg-white rounded-full pointer-events-none mix-blend-difference"
         animate={{
-          x: mousePos.x - (isHovered ? 38 : 13),
-          y: mousePos.y - (isHovered ? 38 : 13),
-          width: isHovered ? 76 : 26,
-          height: isHovered ? 76 : 26,
+          x: mousePos.x - (isHovered ? 28 : 9),
+          y: mousePos.y - (isHovered ? 28 : 9),
+          width: isHovered ? 56 : 18,
+          height: isHovered ? 56 : 18,
           scaleX: isHovered ? 1 : isClicked ? 0.7 : stretchX,
           scaleY: isHovered ? 1 : isClicked ? 0.7 : stretchY,
           rotate: isHovered ? 0 : angle,
         }}
-        transition={{ type: "spring", stiffness: 550, damping: 30, mass: 0.4 }}
-      >
-        {/* Dynamic Action Text Label inside Chameleon Lens */}
-        <AnimatePresence>
-          {isHovered && hoverLabel && (
-            <motion.span
-              initial={{ opacity: 0, scale: 0.6 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.6 }}
-              className="font-mono text-[9px] font-black tracking-widest text-black uppercase select-none text-center px-1"
-            >
-              {hoverLabel}
-            </motion.span>
-          )}
-        </AnimatePresence>
-      </motion.div>
+        transition={{ type: "spring", stiffness: 600, damping: 32, mass: 0.35 }}
+      />
 
-      {/* 2. Precision Laser Core Dot */}
+      {/* 2. Precision Central Targeting Point */}
       <motion.div
         className="fixed top-0 left-0 w-1.5 h-1.5 bg-white rounded-full pointer-events-none mix-blend-difference"
         animate={{
