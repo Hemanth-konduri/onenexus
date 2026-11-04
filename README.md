@@ -33,7 +33,7 @@ An Awwwards-level digital agency platform and interactive client discovery porta
 
 ### 📧 5. Production Nodemailer API Engine (`/api/contact.ts`)
 * **Automated Email Dispatch**: Sends luxury HTML email templates with client brief summaries directly to studio founders.
-* **Zero-Config Setup**: Works with Gmail App Passwords, custom SMTP servers, or Resend API key fallback.
+* **Flexible Architecture**: Supports standard SMTP transport configurations and modern transactional mail providers.
 
 ---
 
@@ -61,17 +61,8 @@ cd onenexus
 npm install
 ```
 
-### 3. Environment Variables Setup (`.env.local`)
-Create a `.env.local` file in the root directory and configure your email credentials:
-
-```env
-# SMTP Configuration (Gmail App Password or Custom SMTP)
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=465
-SMTP_USER=your-email@gmail.com
-SMTP_PASS=your-16-char-app-password
-CONTACT_NOTIFICATION_EMAIL=hello@onenexus.studio
-```
+### 3. Environment Configuration
+Configure your local environment variables in `.env.local` as needed for development and API integrations.
 
 ### 4. Run Development Server
 Start the local development server:
