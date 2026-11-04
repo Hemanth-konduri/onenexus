@@ -6,36 +6,41 @@ export default function FAQ() {
 
   const faqs = [
     {
-      q: "Are you a brand studio, a product studio or a strategy partner?",
-      highlight: "Yes, when the work needs all three.",
-      desc: "The strongest digital experiences connect what a company says, what it makes and how people use it. That is where we work best.",
+      q: "I have a business idea but don't know where to start. Can OneNexus help?",
+      highlight: "Yes, absolutely.",
+      desc: "OneNexus specializes in guiding aspiring entrepreneurs from raw concepts to a complete digital presence—including brand identity, logo, domain, website, and Google Business setup.",
     },
     {
-      q: "We have an idea, but it is still messy. Is that too early?",
-      highlight: "Never too early.",
-      desc: "We regularly work with founders at the earliest concept stages, helping structure ambiguous ideas into clear strategic roadmaps and launch-ready prototypes.",
+      q: "Can you build a social media presence for my existing business?",
+      highlight: "Yes, end-to-end.",
+      desc: "Whether you have no accounts yet or want to revamp existing profiles, we design branded templates, craft engaging posts & reels, write persuasive captions, and structure your channel strategy.",
     },
     {
-      q: "Why work with a small studio instead of a larger agency?",
-      highlight: "Direct access to senior practitioners.",
-      desc: "You collaborate directly with our partners from day one to launch. No junior handoffs, no bureaucratic layers, and complete alignment.",
+      q: "Do you provide monthly social media management?",
+      highlight: "Yes, ongoing growth support.",
+      desc: "Our Monthly Growth Support package handles post design, reels, content creation, captioning, scheduling, and channel management so you can focus entirely on your core business.",
     },
     {
-      q: "Can you help us look credible without making us look like everyone else?",
-      highlight: "Distinctiveness is our core focus.",
-      desc: "We reject boilerplate templates. Every visual asset, typography selection, and interaction is tailored to your business positioning.",
+      q: "Can I choose individual services instead of a complete package?",
+      highlight: "Yes, completely flexible.",
+      desc: "All our services are modular. You can choose specific services such as Website Design, Google Business Profile Setup, or Branding, or opt for a combined growth package.",
     },
     {
-      q: "What happens after the first project?",
-      highlight: "Long-term growth partnership.",
-      desc: "Many partners retain us on ongoing monthly engagements for conversion optimization, feature iterations, and digital marketing growth.",
+      q: "How is the website cost determined?",
+      highlight: "Transparent & requirement-based.",
+      desc: "Website cost depends on your exact project scope—such as page count, custom features, AI integration, interactive elements, and content requirements. We provide itemized quotes upfront.",
+    },
+    {
+      q: "Do you work with clients across India?",
+      highlight: "Yes, serving clients nationwide.",
+      desc: "OneNexus serves small businesses, aspiring founders, and women entrepreneurs across all cities and states in India through seamless remote communication and digital collaboration.",
     },
   ];
 
   return (
     <section
       id="faq"
-      className="relative w-full bg-[#EFECE6] text-[#0F0F11] overflow-hidden border-t border-black/[0.07] px-4 sm:px-8 lg:px-12 py-20 lg:py-32"
+      className="relative w-full bg-[#EFECE6] text-[#111827] overflow-hidden border-t border-black/[0.07] px-4 sm:px-8 lg:px-12 py-20 lg:py-32"
     >
       {/* Continuous Architectural Vertical Grid Lines */}
       <div className="absolute inset-0 pointer-events-none z-0 flex justify-between max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12">
@@ -52,37 +57,37 @@ export default function FAQ() {
         {/* Eyebrow Header */}
         <div className="flex items-center justify-between pb-8 border-b border-black/[0.07] mb-12">
           <div className="flex items-center gap-3">
-            <span className="w-2.5 h-2.5 bg-[#0022FF]" />
+            <span className="w-2.5 h-2.5 bg-[#2554E8]" />
             <span className="font-mono text-xs lg:text-sm tracking-widest uppercase font-bold text-black">
-              QUESTIONS & ANSWERS / FAQ
+              FREQUENTLY ASKED QUESTIONS
             </span>
           </div>
-          <span className="font-mono text-xs text-neutral-500 tracking-widest uppercase">
-            [ SECTION 06 ]
+          <span className="font-mono text-xs text-[#2554E8] tracking-widest uppercase font-bold">
+            [ CLEAR ANSWERS ]
           </span>
         </div>
 
         {/* Section Headline */}
         <div className="mb-16 lg:mb-20">
-          <h2 className="text-4xl sm:text-6xl lg:text-[72px] font-extrabold tracking-tightest leading-[1.05] text-black mb-4">
-            Questions worth asking<br />before we work together.
+          <h2 className="text-4xl sm:text-6xl lg:text-[72px] font-extrabold tracking-tight leading-[1.05] text-black mb-4">
+            FREQUENTLY ASKED <span className="text-[#2554E8]">QUESTIONS.</span>
           </h2>
           <p className="text-neutral-600 text-lg lg:text-xl font-normal max-w-2xl">
-            Not the usual FAQs. Just the questions clients often have when choosing the right partner for something important.
+            Everything you need to know about working with OneNexus to launch and grow your digital presence.
           </p>
         </div>
 
-        {/* Minimalist Line-Divider Accordion List (Brikken Pure Style) */}
-        <ul className="flex flex-col">
+        {/* Minimalist Line-Divider Accordion List */}
+        <ul className="flex flex-col border-b border-black/20">
           {faqs.map((faq, index) => {
             const isOpen = openIndex === index;
             return (
-              <li key={index} className="border-t border-black pb-12">
+              <li key={index} className="border-t border-black/15 pb-8">
                 <button
                   onClick={() => setOpenIndex(isOpen ? null : index)}
                   className="w-full flex items-start justify-between gap-6 pt-8 pb-2 text-left cursor-pointer group"
                 >
-                  <h3 className="font-sans font-bold text-xl sm:text-2xl lg:text-3xl text-black group-hover:text-[#0022FF] transition-colors duration-200">
+                  <h3 className="font-sans font-bold text-xl sm:text-2xl lg:text-3xl text-black group-hover:text-[#2554E8] transition-colors duration-200">
                     {faq.q}
                   </h3>
                   
@@ -105,8 +110,8 @@ export default function FAQ() {
                       className="overflow-hidden"
                     >
                       <p className="text-base sm:text-lg lg:text-xl text-black leading-relaxed mt-4 max-w-3xl">
-                        <span className="font-bold">{faq.highlight} </span>
-                        <span className="text-neutral-500">{faq.desc}</span>
+                        <span className="font-bold text-[#2554E8]">{faq.highlight} </span>
+                        <span className="text-neutral-600">{faq.desc}</span>
                       </p>
                     </motion.div>
                   )}

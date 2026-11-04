@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -8,6 +9,7 @@ export default function Navbar() {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,10 +35,11 @@ export default function Navbar() {
   }, [lastScrollY]);
 
   const navLinks = [
-    { name: "ABOUT", href: "#about" },
-    { name: "SERVICES", href: "#services" },
-    { name: "WORK", href: "#work" },
-    { name: "CONTACT", href: "/contact", isExternal: true },
+    { name: "HOME", href: "/" },
+    { name: "ABOUT", href: "/about" },
+    { name: "SERVICES", href: "/services" },
+    { name: "FAQ", href: "/faq" },
+    { name: "CONTACT", href: "/contact" },
   ];
 
   return (
@@ -46,46 +49,48 @@ export default function Navbar() {
           isVisible ? "translate-y-0" : "-translate-y-full"
         } ${
           isScrolled
-            ? "bg-[#EFECE6]/85 backdrop-blur-md border-b border-black/[0.08] py-4 shadow-sm"
+            ? "bg-[#EFECE6]/90 backdrop-blur-md border-b border-black/[0.08] py-4 shadow-sm"
             : "bg-transparent py-6"
         }`}
       >
         <div className="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 flex items-center justify-between">
-          {/* Chameleon Adaptive Brand Logo */}
+          {/* Brand Logo with consistent blue styling for OneNexus */}
           <Link href="/" className="flex items-center gap-3 group">
             <div className="relative overflow-hidden rounded-[4px] p-0.5 transition-all duration-500 group-hover:shadow-[0_0_20px_rgba(37,84,232,0.4)]">
               <img
                 src="/onenexus-logo-bckgr.png"
-                alt="oneNexus Studio"
+                alt="OneNexus"
                 className="h-8 sm:h-9 w-auto object-contain transition-all duration-500 group-hover:scale-105 group-hover:brightness-110"
               />
             </div>
-            <span className="font-sans font-black tracking-tight text-xl text-[#111827] group-hover:text-[#2554E8] transition-colors duration-300">
-              one<span className="text-[#2554E8] group-hover:text-[#111827]">Nexus</span>
-            </span>
+            <div className="flex flex-col">
+              <span className="font-sans font-black tracking-tight text-xl sm:text-2xl text-[#2554E8] group-hover:opacity-90 transition-opacity">
+                OneNexus
+              </span>
+              <span className="font-mono text-[9px] tracking-widest text-[#475569] uppercase font-semibold hidden sm:block -mt-1">
+                Your Digital Growth Partner
+              </span>
+            </div>
           </Link>
 
-          {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-9 font-mono text-xs tracking-[0.2em] uppercase font-bold text-[#111827]">
-            {navLinks.map((link) =>
-              link.isExternal ? (
+          {/* Navigation Links: Home | About | Services | FAQ | Contact */}
+          <nav className="hidden md:flex items-center gap-8 font-mono text-xs tracking-[0.2em] uppercase font-bold text-[#111827]">
+            {navLinks.map((link) => {
+              const isActive = router.pathname === link.href;
+              return (
                 <Link
                   key={link.name}
                   href={link.href}
-                  className="hover:text-[#2554E8] transition-colors"
+                  className={`transition-colors py-1 border-b-2 ${
+                    isActive
+                      ? "text-[#2554E8] border-[#2554E8]"
+                      : "border-transparent hover:text-[#2554E8]"
+                  }`}
                 >
                   {link.name}
                 </Link>
-              ) : (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  className="hover:text-[#2554E8] transition-colors"
-                >
-                  {link.name}
-                </a>
-              )
-            )}
+              );
+            })}
           </nav>
 
           {/* Right CTA Button */}
@@ -94,7 +99,7 @@ export default function Navbar() {
               href="/contact"
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#111827] hover:bg-[#2554E8] text-white font-mono text-xs tracking-widest uppercase font-bold rounded-[2px] transition-all duration-300 shadow-md hover:shadow-[0_4px_20px_rgba(37,84,232,0.35)] hover:-translate-y-0.5"
             >
-              <span>START A PROJECT</span>
+              <span>GET IN TOUCH</span>
               <ArrowUpRight size={14} />
             </Link>
           </div>
@@ -121,35 +126,28 @@ export default function Navbar() {
             className="fixed inset-x-4 top-20 z-40 bg-[#EFECE6] border border-black/10 rounded-none p-6 shadow-2xl md:hidden"
           >
             <div className="flex flex-col gap-4 font-mono text-xs uppercase tracking-widest">
-              {navLinks.map((link) =>
-                link.isExternal ? (
+              {navLinks.map((link) => {
+                const isActive = router.pathname === link.href;
+                return (
                   <Link
                     key={link.name}
                     href={link.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="py-3 border-b border-black/10 text-[#111827] font-bold flex items-center justify-between hover:text-[#2554E8]"
+                    className={`py-3 border-b border-black/10 font-bold flex items-center justify-between transition-colors ${
+                      isActive ? "text-[#2554E8]" : "text-[#111827] hover:text-[#2554E8]"
+                    }`}
                   >
                     <span>{link.name}</span>
                     <ArrowUpRight size={14} className="text-[#2554E8]" />
                   </Link>
-                ) : (
-                  <a
-                    key={link.name}
-                    href={link.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="py-3 border-b border-black/10 text-[#111827] font-bold flex items-center justify-between hover:text-[#2554E8]"
-                  >
-                    <span>{link.name}</span>
-                    <ArrowUpRight size={14} className="text-[#2554E8]" />
-                  </a>
-                )
-              )}
+                );
+              })}
               <Link
                 href="/contact"
                 onClick={() => setMobileMenuOpen(false)}
                 className="mt-3 w-full py-4 bg-[#2554E8] text-white font-mono text-xs uppercase tracking-widest font-bold text-center rounded-[2px] transition-colors block shadow-lg"
               >
-                START A PROJECT ↗
+                START YOUR GROWTH JOURNEY ↗
               </Link>
             </div>
           </motion.div>

@@ -8,6 +8,7 @@ export default function CustomCursor() {
   const [isHovered, setIsHovered] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [isExcluded, setIsExcluded] = useState(false);
 
   const prevMouseRef = useRef({ x: -100, y: -100 });
 
@@ -20,6 +21,14 @@ export default function CustomCursor() {
     document.body.classList.add("custom-cursor-active");
 
     const handleMouseMove = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      const inExcludedZone =
+        Boolean(target?.closest("#nexus-chatbot-window")) ||
+        target?.tagName === "INPUT" ||
+        target?.tagName === "TEXTAREA";
+
+      setIsExcluded(inExcludedZone);
+
       const vx = e.clientX - prevMouseRef.current.x;
       const vy = e.clientY - prevMouseRef.current.y;
       prevMouseRef.current = { x: e.clientX, y: e.clientY };
@@ -39,7 +48,15 @@ export default function CustomCursor() {
     };
 
     const handleMouseOver = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+
+      const inExcludedZone =
+        Boolean(target.closest("#nexus-chatbot-window")) ||
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA";
+
+      setIsExcluded(inExcludedZone);
 
       const interactiveEl =
         target.tagName === "BUTTON" ||
@@ -50,7 +67,7 @@ export default function CustomCursor() {
         target.classList.contains("cursor-pointer") ||
         target.closest(".work-card");
 
-      if (interactiveEl) {
+      if (interactiveEl && !inExcludedZone) {
         setIsHovered(true);
       } else {
         setIsHovered(false);
@@ -78,7 +95,11 @@ export default function CustomCursor() {
   const stretchY = Math.max(1 - speed * 0.008, 0.7);
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-[99999] overflow-hidden select-none">
+    <div
+      className={`fixed inset-0 pointer-events-none z-[99999] overflow-hidden select-none transition-opacity duration-150 ${
+        isExcluded ? "opacity-0" : "opacity-100"
+      }`}
+    >
       {/* 1. Trailing Particle Echo */}
       <motion.div
         className="fixed top-0 left-0 w-2 h-2 rounded-full bg-[#2554E8]/40 pointer-events-none blur-[1px]"

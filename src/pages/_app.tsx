@@ -4,6 +4,9 @@ import { useEffect } from "react";
 import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
+import { InquiryProvider } from "@/context/InquiryContext";
+import FloatingInquiryBar from "@/components/FloatingInquiryBar";
+import FloatingActionHub from "@/components/FloatingActionHub";
 
 export default function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
@@ -35,6 +38,13 @@ export default function App({ Component, pageProps }: AppProps) {
     };
   }, []);
 
-  return <Component {...pageProps} />;
+  return (
+    <InquiryProvider>
+      <Component {...pageProps} />
+      <FloatingInquiryBar />
+      <FloatingActionHub />
+    </InquiryProvider>
+  );
 }
+
 

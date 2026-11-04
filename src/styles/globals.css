@@ -121,8 +121,65 @@ html.lenis, html.lenis body {
 body.custom-cursor-active,
 body.custom-cursor-active a,
 body.custom-cursor-active button,
-body.custom-cursor-active input,
-body.custom-cursor-active textarea,
 body.custom-cursor-active [role="button"] {
   cursor: none !important;
+}
+
+/* Retain standard native cursors inside inputs, textareas, and the interactive Chatbot window */
+body.custom-cursor-active input,
+body.custom-cursor-active textarea,
+body.custom-cursor-active #nexus-chatbot-window,
+body.custom-cursor-active #nexus-chatbot-window * {
+  cursor: auto !important;
+}
+
+body.custom-cursor-active input,
+body.custom-cursor-active textarea {
+  cursor: text !important;
+}
+
+body.custom-cursor-active #nexus-chatbot-window button,
+body.custom-cursor-active #nexus-chatbot-window a,
+body.custom-cursor-active #nexus-chatbot-window [role="button"] {
+  cursor: pointer !important;
+}
+
+/* Chatbot Scroll Containment & Lenis Smooth Scroll Isolation */
+#nexus-chatbot-window,
+#nexus-chatbot-window *,
+#nexus-chatbot-window [data-lenis-prevent] {
+  overscroll-behavior: contain !important;
+}
+
+/* Accessibility: Prefers Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Infinite Smooth Marquee Ticker */
+@keyframes marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 30s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
 }

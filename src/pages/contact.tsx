@@ -1,236 +1,204 @@
 import Head from "next/head";
 import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
-import gsap from "gsap";
 import {
-  ArrowUpRight,
   ArrowLeft,
-  ArrowRight,
-  Check,
-  Copy,
-  Send,
-  ShieldCheck,
-  Clock,
-  DollarSign,
-  Calendar,
   CheckCircle2,
-  FileText,
-  Sliders,
+  Send,
+  Mail,
+  MessageSquare,
+  Globe,
+  Clock,
   User,
-  Target,
-  Sparkles,
+  Phone,
+  Building2,
+  Sliders,
+  FileText,
+  Copy,
+  Check,
+  X,
+  Plus,
+  Layers,
 } from "lucide-react";
-import CustomCursor from "@/components/CustomCursor";
+import { useInquiry } from "@/context/InquiryContext";
+import { getWhatsAppUrl } from "@/lib/whatsapp";
 
-// Dynamically import R3F 3D GLTF Scene to prevent SSR hydration issues
+function InstagramIcon({ size = 16, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+    </svg>
+  );
+}
+import CustomCursor from "@/components/CustomCursor";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+
+// Dynamically import 3D GLTF Scene to prevent SSR issues
 const Contact3DScene = dynamic(() => import("@/components/Contact3DScene"), {
   ssr: false,
 });
 
+const QUICK_SERVICE_OPTIONS = [
+  "AI Services",
+  "Branding & Visual Identity",
+  "Social Media Marketing",
+  "Website Design & Craft",
+  "Digital Business Setup",
+  "Monthly Growth Support",
+  "Small Businesses Presence",
+  "Aspiring Entrepreneurs Launch",
+  "Women Entrepreneurs Growth",
+];
+
 export default function ContactPage() {
-  // Active Step State (1 to 5)
-  const [currentStep, setCurrentStep] = useState<number>(1);
-  const totalSteps = 5;
+  const router = useRouter();
+  const { selectedServices, addService, removeService, clearServices, toggleService } = useInquiry();
 
-  // Form Data State
   const [formData, setFormData] = useState({
-    // Step 1: Contact Profile
-    name: "",
+    fullName: "",
+    mobileNumber: "",
+    whatsappNumber: "",
     email: "",
-    phone: "",
-    company: "",
-    website: "",
-
-    // Step 2: Scope & Services
-    services: [] as string[],
-
-    // Step 3: Goals & Audience
-    primaryGoal: "🚀 Launch a New Venture",
-    targetAudience: "",
-
-    // Step 4: Budget & Timeline
-    budget: "$40k – $80k",
-    timeline: "1–2 Months",
-
-    // Step 5: Brief & Details
-    projectOverview: "",
-    referenceLinks: "",
-    referralSource: "Awwwards / Design Showcase",
+    businessName: "",
+    businessType: "Planning to Start" as "Planning to Start" | "Existing Business",
+    serviceRequired: "AI Services",
+    details: "",
+    preferredTime: "Morning (9 AM - 12 PM)",
   });
 
+  const [customInput, setCustomInput] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [referenceId, setReferenceId] = useState("");
-  const [copied, setCopied] = useState(false);
-  const [stepError, setStepError] = useState("");
+  const [formError, setFormError] = useState("");
+  const [copiedEmail, setCopiedEmail] = useState(false);
 
-  // Real-time Studio Clocks
-  const [times, setTimes] = useState({
-    london: "",
-    ny: "",
-    tokyo: "",
-  });
-
-  const stepContainerRef = useRef<HTMLDivElement>(null);
-
-  // Scroll direction state for header bar hide/show
-  const [navVisible, setNavVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
-
+  // Auto-add URL query parameter service if passed
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      if (currentScrollY <= 40) {
-        setNavVisible(true);
-      } else if (currentScrollY > lastScrollY && currentScrollY - lastScrollY > 4) {
-        setNavVisible(false);
-      } else if (currentScrollY < lastScrollY && lastScrollY - currentScrollY > 4) {
-        setNavVisible(true);
-      }
-      setLastScrollY(currentScrollY);
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
-
-  useEffect(() => {
-    const updateClocks = () => {
-      const now = new Date();
-      setTimes({
-        london: now.toLocaleTimeString("en-GB", { timeZone: "Europe/London", hour: "2-digit", minute: "2-digit" }),
-        ny: now.toLocaleTimeString("en-US", { timeZone: "America/New_York", hour: "2-digit", minute: "2-digit" }),
-        tokyo: now.toLocaleTimeString("en-JP", { timeZone: "Asia/Tokyo", hour: "2-digit", minute: "2-digit" }),
-      });
-    };
-
-    updateClocks();
-    const interval = setInterval(updateClocks, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // GSAP Step Animation Trigger
-  useEffect(() => {
-    if (stepContainerRef.current) {
-      gsap.fromTo(
-        stepContainerRef.current,
-        { opacity: 0, x: 20 },
-        { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }
-      );
-    }
-  }, [currentStep]);
-
-  const toggleService = (service: string) => {
-    if (formData.services.includes(service)) {
-      setFormData({
-        ...formData,
-        services: formData.services.filter((s) => s !== service),
-      });
-    } else {
-      setFormData({
-        ...formData,
-        services: [...formData.services, service],
-      });
-    }
-  };
-
-  const handleNext = () => {
-    setStepError("");
-    if (currentStep === 1) {
-      if (!formData.name.trim() || !formData.email.trim()) {
-        setStepError("Please provide your name and work email to continue.");
-        return;
+    if (router.isReady && router.query.service) {
+      const qService = Array.isArray(router.query.service)
+        ? router.query.service[0]
+        : router.query.service;
+      if (qService) {
+        addService(qService);
+        setFormData((prev) => ({ ...prev, serviceRequired: qService }));
       }
     }
-    if (currentStep < totalSteps) {
-      setCurrentStep((prev) => prev + 1);
-      window.scrollTo({ top: 180, behavior: "smooth" });
-    }
-  };
+  }, [router.isReady, router.query.service]);
 
-  const handlePrev = () => {
-    setStepError("");
-    if (currentStep > 1) {
-      setCurrentStep((prev) => prev - 1);
-      window.scrollTo({ top: 180, behavior: "smooth" });
+  const handleAddCustomItem = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (customInput.trim()) {
+      addService(customInput.trim());
+      setCustomInput("");
     }
   };
 
   const handleCopyEmail = () => {
-    navigator.clipboard.writeText("hello@onenexus.studio");
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    navigator.clipboard.writeText("onenexus789@gmail.com");
+    setCopiedEmail(true);
+    setTimeout(() => setCopiedEmail(false), 2000);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStepError("");
+    setFormError("");
 
-    if (!formData.projectOverview.trim()) {
-      setStepError("Please provide a brief overview of your project vision.");
+    if (!formData.fullName.trim()) {
+      setFormError("Please enter your full name.");
+      return;
+    }
+    if (!formData.mobileNumber.trim()) {
+      setFormError("Please enter your mobile number.");
+      return;
+    }
+    if (!formData.whatsappNumber.trim()) {
+      setFormError("Please enter your WhatsApp number.");
+      return;
+    }
+    if (!formData.email.trim() || !formData.email.includes("@")) {
+      setFormError("Please enter a valid email address.");
+      return;
+    }
+    if (!formData.details.trim()) {
+      setFormError("Please describe your business or idea details.");
       return;
     }
 
     setIsSubmitting(true);
 
+    const payload = {
+      ...formData,
+      selectedServices:
+        selectedServices.length > 0
+          ? selectedServices
+          : [formData.serviceRequired],
+    };
+
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       const result = await res.json();
 
       if (!res.ok || !result.success) {
-        setStepError(result.error || result.message || "Failed to transmit discovery brief.");
+        setFormError(result.error || result.message || "Failed to submit enquiry.");
         setIsSubmitting(false);
         return;
       }
 
       setReferenceId(result.referenceId || `NEX-${Date.now().toString(36).toUpperCase()}`);
       setSubmitted(true);
-      window.scrollTo({ top: 200, behavior: "smooth" });
+      window.scrollTo({ top: 180, behavior: "smooth" });
     } catch (err: any) {
-      setStepError("Network connection issue. Please check your internet or email hello@onenexus.studio directly.");
+      setFormError("Network issue. Please email onenexus789@gmail.com directly.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const stepTitles = [
-    "Client Profile & Contact Details",
-    "Required Disciplines & Scope",
-    "Primary Business Goals & Audience",
-    "Budget Tier & Target Timeline",
-    "Project Brief & Narrative Vision",
-  ];
-
   return (
     <>
       <Head>
-        <title>Initiate Project — oneNexus Studio</title>
+        <title>Contact Us — OneNexus | Enquiry & Digital Growth Partner</title>
         <meta
           name="description"
-          content="Start a conversation with oneNexus. Complete our step-by-step strategic project discovery questionnaire to partner directly with studio founders."
+          content="Get in touch with OneNexus. Submit your business enquiry for AI Services, Branding, Social Media Marketing, Website Design, or Digital Business Setup."
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/onenexus-logo-bckgrpng" />
-        <link rel="apple-touch-icon" href="/onenexus-logo-bckgr.png" />
+        <link rel="icon" href="/onenexus-logo-bckgr.png" />
       </Head>
 
       <CustomCursor />
 
-      <div className="min-h-screen bg-[#EFECE6] text-[#111827] selection:bg-[#2554E8] selection:text-white font-sans relative overflow-x-hidden">
-        
-        {/* Interactive 3D GLTF Scene Background Layer (/models/3d_scene_for_onenexus.gltf) */}
+      <div className="min-h-screen bg-[#EFECE6] text-[#111827] selection:bg-[#2554E8] selection:text-white font-sans relative overflow-x-hidden pt-20">
+        <Navbar />
+
+        {/* 3D Scene Layer */}
         <Contact3DScene />
 
-        {/* Soft Cream Readability Overlay */}
-        <div className="fixed inset-0 z-0 bg-gradient-to-b from-[#EFECE6]/20 via-[#EFECE6]/35 to-[#EFECE6]/50 pointer-events-none" />
+        {/* Readability Overlay */}
+        <div className="fixed inset-0 z-0 bg-gradient-to-b from-[#EFECE6]/30 via-[#EFECE6]/50 to-[#EFECE6]/70 pointer-events-none" />
 
-        {/* Architectural Background Grid Lines */}
+        {/* Architectural Grid Lines */}
         <div className="fixed inset-0 pointer-events-none z-0 flex justify-between max-w-[1700px] mx-auto px-4 sm:px-8 lg:px-12">
           {[...Array(7)].map((_, i) => (
             <div
@@ -240,636 +208,458 @@ export default function ContactPage() {
           ))}
         </div>
 
-        {/* Header Bar */}
-        <header className={`sticky top-0 z-50 w-full bg-[#EFECE6]/85 backdrop-blur-md border-b border-black/[0.08] px-4 sm:px-8 lg:px-12 py-5 transition-transform duration-300 ${navVisible ? "translate-y-0" : "-translate-y-full"}`}>
-          <div className="max-w-[1700px] mx-auto flex items-center justify-between">
-            {/* Return to Studio */}
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2.5 font-mono text-xs font-bold tracking-widest text-[#111827] hover:text-[#2554E8] transition-colors group uppercase"
-            >
-              <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-              <span>RETURN TO STUDIO</span>
-            </Link>
-
-            {/* Chameleon Adaptive Brand Logo */}
-            <Link href="/" className="flex items-center gap-3 group">
-              <div className="relative overflow-hidden rounded-[4px] p-0.5 transition-all duration-500 group-hover:shadow-[0_0_20px_rgba(37,84,232,0.4)]">
-                <img
-                  src="/onenexus-logo-bckgr.png"
-                  alt="oneNexus Studio"
-                  className="h-8 sm:h-9 w-auto object-contain transition-all duration-500 group-hover:scale-105 group-hover:brightness-110"
-                />
-              </div>
-              <span className="font-sans font-bold tracking-tight text-xl text-[#111827] group-hover:text-[#2554E8] transition-colors duration-300">
-                one<span className="text-[#2554E8] group-hover:text-[#111827]">Nexus</span>
-              </span>
-            </Link>
-
-            {/* Live Indicator */}
-            <div className="hidden md:flex items-center gap-2.5 px-3 py-1 bg-black/[0.04] border border-black/10 rounded-full font-mono text-[11px] font-bold text-[#111827] uppercase tracking-widest">
-              <span className="w-2 h-2 rounded-full bg-[#2554E8] animate-ping" />
-              <span>Q4 CAPABILITY AVAILABLE</span>
-            </div>
-          </div>
-        </header>
-
-        {/* Main Section */}
-        <main className="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 pt-12 sm:pt-16 pb-28">
-          
-          {/* Section Header */}
-          <div className="flex items-center justify-between pb-6 border-b border-black/[0.08] mb-8">
+        {/* Main Contact Section */}
+        <main className="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 pt-10 sm:pt-14 pb-28">
+          {/* Top Header Strip */}
+          <div className="flex items-center justify-between pb-6 border-b border-black/[0.08] mb-10">
             <div className="flex items-center gap-3">
               <span className="w-2.5 h-2.5 bg-[#2554E8] rounded-[1px]" />
               <span className="font-mono text-xs sm:text-sm tracking-[0.2em] uppercase font-bold text-[#111827]">
-                PROJECT DISCOVERY QUESTIONNAIRE
+                ENQUIRY FORM
               </span>
             </div>
-            <span className="font-mono text-xs sm:text-sm text-neutral-500 tracking-widest uppercase">
-              [ ONBOARDING FLOW ]
+            <span className="font-mono text-xs sm:text-sm text-[#2554E8] tracking-widest uppercase font-bold">
+              [ ONENEXUS GROWTH PARTNER ]
             </span>
           </div>
 
-          {/* Section Big Title */}
-          <div className="mb-10">
+          {/* Headline & Title */}
+          <div className="mb-12">
             <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tighter leading-[0.95] text-[#111827] uppercase select-none">
-              INITIATE <span className="text-[#2554E8]">PROJECT DISCOVERY.</span>
+              START YOUR <span className="text-[#2554E8]">GROWTH JOURNEY.</span>
             </h1>
             <p className="mt-3 text-base sm:text-lg text-[#475569] font-normal max-w-2xl">
-              Answer the step-by-step questions below to help us understand your vision, scope, and objectives.
+              Fill out the enquiry form below. Our team will review your business requirements and contact you shortly.
             </p>
           </div>
 
-          {!submitted && (
-            /* Multi-step Progress Tracker Strip */
-            <div className="mb-10 bg-[#F4F0EA]/90 backdrop-blur-md border border-black/10 p-6 sm:p-8 shadow-sm">
-              <div className="flex items-center justify-between mb-4 font-mono text-xs font-bold text-[#111827] uppercase tracking-widest">
-                <span className="text-[#2554E8]">
-                  STEP 0{currentStep} OF 0{totalSteps} — {stepTitles[currentStep - 1]}
-                </span>
-                <span>{Math.round((currentStep / totalSteps) * 100)}% COMPLETED</span>
-              </div>
-
-              {/* Progress Bar Line */}
-              <div className="w-full h-2 bg-black/10 overflow-hidden rounded-none mb-6">
-                <div
-                  className="h-full bg-[#2554E8] transition-all duration-500 ease-out"
-                  style={{ width: `${(currentStep / totalSteps) * 100}%` }}
-                />
-              </div>
-
-              {/* Step Navigation Pills */}
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                {stepTitles.map((title, idx) => {
-                  const stepNum = idx + 1;
-                  const isCompleted = currentStep > stepNum;
-                  const isCurrent = currentStep === stepNum;
-
-                  return (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => {
-                        if (isCompleted) setCurrentStep(stepNum);
-                      }}
-                      disabled={!isCompleted && !isCurrent}
-                      className={`p-3 font-mono text-[11px] font-bold text-left border transition-all duration-300 flex items-center justify-between ${
-                        isCurrent
-                          ? "bg-[#111827] text-white border-[#111827]"
-                          : isCompleted
-                          ? "bg-white text-[#2554E8] border-[#2554E8] cursor-pointer"
-                          : "bg-black/[0.03] text-neutral-400 border-black/10 cursor-not-allowed"
-                      }`}
-                    >
-                      <span className="truncate">0{stepNum} / {title.split(" ")[0]}</span>
-                      {isCompleted && <Check size={14} className="shrink-0 text-[#2554E8]" />}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Form Container */}
-          {submitted ? (
-            /* Interactive Receipt Screen */
-            <div className="bg-[#F4F0EA]/95 backdrop-blur-md border border-black/10 p-8 sm:p-14 lg:p-16 text-center max-w-3xl mx-auto shadow-xl">
-              <div className="w-16 h-16 rounded-full bg-[#2554E8] text-white flex items-center justify-center mx-auto mb-6 shadow-xl">
-                <CheckCircle2 size={36} />
-              </div>
-
-              <span className="font-mono text-xs font-extrabold text-[#2554E8] uppercase tracking-widest block mb-2">
-                DISCOVERY DISPATCHED
-              </span>
-
-              <h2 className="font-sans font-black text-3xl sm:text-5xl text-[#111827] tracking-tight uppercase mb-4">
-                PROPOSAL INITIATED.
-              </h2>
-
-              <p className="font-sans text-base sm:text-lg text-[#475569] max-w-xl mx-auto mb-8 leading-relaxed">
-                Thank you, <strong className="text-[#111827]">{formData.name}</strong>. Your inquiry reference code is <span className="font-mono font-bold text-[#2554E8]">{referenceId || "NEX-DISCOVERY"}</span>. Our founders will review your responses and reach out within 24 hours.
-              </p>
-
-              {/* Summary Table */}
-              <div className="p-6 bg-white/80 border border-black/10 text-left font-mono text-xs space-y-3 mb-8 max-w-md mx-auto">
-                <div className="flex justify-between border-b border-black/10 pb-2">
-                  <span className="text-neutral-500">CLIENT EMAIL</span>
-                  <span className="font-bold text-[#111827]">{formData.email}</span>
-                </div>
-                <div className="flex justify-between border-b border-black/10 pb-2">
-                  <span className="text-neutral-500">PRIMARY GOAL</span>
-                  <span className="font-bold text-[#111827]">{formData.primaryGoal}</span>
-                </div>
-                <div className="flex justify-between border-b border-black/10 pb-2">
-                  <span className="text-neutral-500">INVESTMENT TIER</span>
-                  <span className="font-bold text-[#2554E8]">{formData.budget}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-neutral-500">TARGET TIMELINE</span>
-                  <span className="font-bold text-[#111827]">{formData.timeline}</span>
-                </div>
-              </div>
-
-              <button
-                onClick={() => {
-                  setSubmitted(false);
-                  setCurrentStep(1);
-                }}
-                className="px-8 py-4 bg-[#111827] hover:bg-[#2554E8] text-white font-mono text-xs uppercase tracking-widest font-bold transition-all duration-300"
-              >
-                START A NEW DISCOVERY BRIEF
-              </button>
-            </div>
-          ) : (
-            /* STEP-BY-STEP QUESTION CONTAINERS */
-            <div ref={stepContainerRef} className="bg-[#F4F0EA]/95 backdrop-blur-md border border-black/10 p-8 sm:p-12 lg:p-14 shadow-sm">
-              
-              {/* Validation Error Message */}
-              {stepError && (
-                <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/30 text-rose-700 font-mono text-xs font-bold uppercase tracking-wider">
-                  ⚠️ {stepError}
-                </div>
-              )}
-
-              {/* QUESTION CONTAINER 01: Client Profile */}
-              {currentStep === 1 && (
-                <div className="space-y-8">
-                  <div className="flex items-center justify-between pb-6 border-b border-black/10">
-                    <div>
-                      <span className="font-mono text-xs font-bold text-[#2554E8] uppercase tracking-widest block mb-1">
-                        QUESTION 01 OF 05
-                      </span>
-                      <h3 className="font-sans font-black text-2xl sm:text-3xl text-[#111827] uppercase tracking-tight">
-                        CLIENT PROFILE & CONTACT DETAILS
-                      </h3>
-                    </div>
-                    <User size={28} className="text-[#2554E8] hidden sm:block" />
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+            {/* Left Column: Form / Success State (8 cols) */}
+            <div className="lg:col-span-8">
+              {submitted ? (
+                /* Success Message Container */
+                <div className="bg-[#F4F0EA]/95 backdrop-blur-md border border-black/10 p-8 sm:p-14 text-center shadow-xl">
+                  <div className="w-16 h-16 rounded-full bg-[#2554E8] text-white flex items-center justify-center mx-auto mb-6 shadow-xl">
+                    <CheckCircle2 size={36} />
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block font-mono text-xs font-bold uppercase tracking-wider text-[#111827] mb-2">
-                        FULL NAME *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        placeholder="e.g. Hemanth Kumar"
-                        className="w-full px-5 py-4 bg-white border border-black/15 text-[#111827] placeholder:text-neutral-400 focus:outline-none focus:border-[#2554E8] text-sm font-medium"
-                      />
-                    </div>
+                  <span className="font-mono text-xs font-extrabold text-[#2554E8] uppercase tracking-widest block mb-2">
+                    ENQUIRY RECEIVED
+                  </span>
 
-                    <div>
-                      <label className="block font-mono text-xs font-bold uppercase tracking-wider text-[#111827] mb-2">
-                        WORK EMAIL *
-                      </label>
-                      <input
-                        type="email"
-                        required
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        placeholder="hemanth@company.com"
-                        className="w-full px-5 py-4 bg-white border border-black/15 text-[#111827] placeholder:text-neutral-400 focus:outline-none focus:border-[#2554E8] text-sm font-medium"
-                      />
-                    </div>
+                  <h2 className="font-sans font-black text-3xl sm:text-4xl text-[#111827] tracking-tight uppercase mb-4">
+                    THANK YOU FOR REACHING OUT!
+                  </h2>
 
-                    <div>
-                      <label className="block font-mono text-xs font-bold uppercase tracking-wider text-[#111827] mb-2">
-                        DIRECT PHONE / WHATSAPP (OPTIONAL)
-                      </label>
-                      <input
-                        type="tel"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        placeholder="+1 (555) 019-2834"
-                        className="w-full px-5 py-4 bg-white border border-black/15 text-[#111827] placeholder:text-neutral-400 focus:outline-none focus:border-[#2554E8] text-sm font-medium"
-                      />
-                    </div>
+                  <p className="font-sans text-base sm:text-lg text-[#475569] max-w-xl mx-auto mb-8 leading-relaxed">
+                    Our team will review your requirements and contact you shortly at <strong className="text-[#111827]">{formData.email}</strong> or <strong className="text-[#111827]">{formData.mobileNumber}</strong>.
+                  </p>
 
-                    <div>
-                      <label className="block font-mono text-xs font-bold uppercase tracking-wider text-[#111827] mb-2">
-                        ORGANIZATION / BRAND NAME
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.company}
-                        onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                        placeholder="Company Name Ltd."
-                        className="w-full px-5 py-4 bg-white border border-black/15 text-[#111827] placeholder:text-neutral-400 focus:outline-none focus:border-[#2554E8] text-sm font-medium"
-                      />
+                  <div className="p-6 bg-white/80 border border-black/10 text-left font-mono text-xs space-y-3 mb-8 max-w-md mx-auto">
+                    <div className="flex justify-between border-b border-black/10 pb-2">
+                      <span className="text-neutral-500">REFERENCE ID</span>
+                      <span className="font-bold text-[#2554E8]">{referenceId}</span>
                     </div>
-
-                    <div className="sm:col-span-2">
-                      <label className="block font-mono text-xs font-bold uppercase tracking-wider text-[#111827] mb-2">
-                        CURRENT WEBSITE / APP URL (IF APPLICABLE)
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.website}
-                        onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                        placeholder="https://yourcompany.com"
-                        className="w-full px-5 py-4 bg-white border border-black/15 text-[#111827] placeholder:text-neutral-400 focus:outline-none focus:border-[#2554E8] text-sm font-medium"
-                      />
+                    <div className="flex justify-between border-b border-black/10 pb-2">
+                      <span className="text-neutral-500">FULL NAME</span>
+                      <span className="font-bold text-[#111827]">{formData.fullName}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-black/10 pb-2">
+                      <span className="text-neutral-500">SERVICE REQUIRED</span>
+                      <span className="font-bold text-[#2554E8]">{formData.serviceRequired}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-neutral-500">BUSINESS TYPE</span>
+                      <span className="font-bold text-[#111827]">{formData.businessType}</span>
                     </div>
                   </div>
+
+                  <button
+                    onClick={() => {
+                      setSubmitted(false);
+                      setFormData({
+                        fullName: "",
+                        mobileNumber: "",
+                        whatsappNumber: "",
+                        email: "",
+                        businessName: "",
+                        businessType: "Planning to Start",
+                        serviceRequired: "AI Services",
+                        details: "",
+                        preferredTime: "Morning (9 AM - 12 PM)",
+                      });
+                    }}
+                    className="px-8 py-4 bg-[#111827] hover:bg-[#2554E8] text-white font-mono text-xs uppercase tracking-widest font-bold transition-colors"
+                  >
+                    SUBMIT ANOTHER ENQUIRY
+                  </button>
                 </div>
-              )}
-
-              {/* QUESTION CONTAINER 02: Required Disciplines */}
-              {currentStep === 2 && (
-                <div className="space-y-8">
-                  <div className="flex items-center justify-between pb-6 border-b border-black/10">
-                    <div>
-                      <span className="font-mono text-xs font-bold text-[#2554E8] uppercase tracking-widest block mb-1">
-                        QUESTION 02 OF 05
-                      </span>
-                      <h3 className="font-sans font-black text-2xl sm:text-3xl text-[#111827] uppercase tracking-tight">
-                        REQUIRED DISCIPLINES & SCOPE
-                      </h3>
+              ) : (
+                /* Primary Enquiry Form */
+                <form
+                  onSubmit={handleSubmit}
+                  className="bg-[#F4F0EA]/95 backdrop-blur-md border border-black/10 p-8 sm:p-12 shadow-sm space-y-8"
+                >
+                  {formError && (
+                    <div className="p-4 bg-rose-500/10 border border-rose-500/30 text-rose-700 font-mono text-xs font-bold uppercase tracking-wider">
+                      ⚠️ {formError}
                     </div>
-                    <Sliders size={28} className="text-[#2554E8] hidden sm:block" />
-                  </div>
+                  )}
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {[
-                      "Brand Positioning & Strategy",
-                      "Logo & Visual Identity System",
-                      "Web & Mobile UI/UX Design",
-                      "Frontend Motion & Next.js Architecture",
-                      "Full-Stack Web App Development",
-                      "Growth Funnel Strategy",
-                      "Social Media & Campaign Creatives",
-                      "AI Automation & System Integration",
-                      "Performance & SEO Infrastructure",
-                    ].map((service) => {
-                      const isSelected = formData.services.includes(service);
-
-                      return (
+                  {/* Interactive Selected Inquiry Blueprint Summary Box */}
+                  <div className="p-6 bg-white border border-black/15 shadow-sm space-y-4">
+                    <div className="flex items-center justify-between border-b border-black/10 pb-3">
+                      <div className="flex items-center gap-2">
+                        <Layers size={16} className="text-[#2554E8]" />
+                        <span className="font-mono text-xs font-black uppercase tracking-widest text-[#111827]">
+                          YOUR SELECTED INQUIRY BLUEPRINT ({selectedServices.length})
+                        </span>
+                      </div>
+                      {selectedServices.length > 0 && (
                         <button
                           type="button"
-                          key={service}
-                          onClick={() => toggleService(service)}
-                          className={`p-5 font-sans font-bold text-sm text-left border transition-all duration-300 flex items-center justify-between cursor-pointer ${
-                            isSelected
-                              ? "bg-[#2554E8] text-white border-[#2554E8] shadow-md"
-                              : "bg-white text-[#111827] border-black/10 hover:border-black/30"
-                          }`}
+                          onClick={clearServices}
+                          className="font-mono text-[10px] uppercase font-bold text-neutral-500 hover:text-rose-600 transition-colors"
                         >
-                          <span>{service}</span>
-                          <div
-                            className={`w-5 h-5 border flex items-center justify-center ${
-                              isSelected ? "bg-white border-white text-[#2554E8]" : "border-neutral-400"
-                            }`}
-                          >
-                            {isSelected && <Check size={12} strokeWidth={3} />}
-                          </div>
+                          Clear All
                         </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* QUESTION CONTAINER 03: Primary Business Goals */}
-              {currentStep === 3 && (
-                <div className="space-y-8">
-                  <div className="flex items-center justify-between pb-6 border-b border-black/10">
-                    <div>
-                      <span className="font-mono text-xs font-bold text-[#2554E8] uppercase tracking-widest block mb-1">
-                        QUESTION 03 OF 05
-                      </span>
-                      <h3 className="font-sans font-black text-2xl sm:text-3xl text-[#111827] uppercase tracking-tight">
-                        PRIMARY BUSINESS GOALS & AUDIENCE
-                      </h3>
+                      )}
                     </div>
-                    <Target size={28} className="text-[#2554E8] hidden sm:block" />
-                  </div>
 
-                  <div className="space-y-8">
-                    <div>
-                      <label className="block font-mono text-xs font-bold uppercase tracking-wider text-[#111827] mb-4">
-                        WHAT IS THE PRIMARY GOAL FOR THIS ENGAGEMENT?
-                      </label>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {[
-                          "🚀 Launch a New Venture",
-                          "⚡ Re-architect Existing Product",
-                          "📈 Scale Conversion & Revenue",
-                          "🎨 Elevate Brand Craft & Perception",
-                        ].map((goal) => {
-                          const isSelected = formData.primaryGoal === goal;
-
-                          return (
+                    {selectedServices.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {selectedServices.map((service, idx) => (
+                          <span
+                            key={idx}
+                            className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#2554E8]/10 text-[#2554E8] border border-[#2554E8]/25 text-xs font-sans font-bold rounded-[2px]"
+                          >
+                            <CheckCircle2 size={14} className="text-[#2554E8]" />
+                            <span>{service}</span>
                             <button
                               type="button"
-                              key={goal}
-                              onClick={() => setFormData({ ...formData, primaryGoal: goal })}
-                              className={`p-5 font-sans font-bold text-sm text-center border transition-all duration-300 cursor-pointer ${
-                                isSelected
-                                  ? "bg-[#111827] text-white border-[#111827]"
-                                  : "bg-white text-[#111827] border-black/10 hover:border-black/30"
-                              }`}
+                              onClick={() => removeService(service)}
+                              className="text-neutral-400 hover:text-rose-600 transition-colors"
                             >
-                              {goal}
+                              <X size={13} />
                             </button>
-                          );
-                        })}
+                          </span>
+                        ))}
                       </div>
-                    </div>
-
-                    <div>
-                      <label className="block font-mono text-xs font-bold uppercase tracking-wider text-[#111827] mb-2">
-                        DESCRIBE YOUR TARGET AUDIENCE / USERS
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.targetAudience}
-                        onChange={(e) => setFormData({ ...formData, targetAudience: e.target.value })}
-                        placeholder="e.g. Enterprise SaaS buyers, Tech Founders, Gen-Z D2C shoppers..."
-                        className="w-full px-5 py-4 bg-white border border-black/15 text-[#111827] placeholder:text-neutral-400 focus:outline-none focus:border-[#2554E8] text-sm font-medium"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* QUESTION CONTAINER 04: Budget & Timeline */}
-              {currentStep === 4 && (
-                <div className="space-y-8">
-                  <div className="flex items-center justify-between pb-6 border-b border-black/10">
-                    <div>
-                      <span className="font-mono text-xs font-bold text-[#2554E8] uppercase tracking-widest block mb-1">
-                        QUESTION 04 OF 05
-                      </span>
-                      <h3 className="font-sans font-black text-2xl sm:text-3xl text-[#111827] uppercase tracking-tight">
-                        BUDGET TIER & TARGET TIMELINE
-                      </h3>
-                    </div>
-                    <DollarSign size={28} className="text-[#2554E8] hidden sm:block" />
-                  </div>
-
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                    {/* Budget Selector */}
-                    <div>
-                      <label className="block font-mono text-xs font-bold uppercase tracking-wider text-[#111827] mb-4">
-                        ESTIMATED INVESTMENT BUDGET
-                      </label>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                        {["< $20k", "$20k – $40k", "$40k – $80k", "$80k – $150k+"].map((b) => {
-                          const isSelected = formData.budget === b;
-
-                          return (
-                            <button
-                              type="button"
-                              key={b}
-                              onClick={() => setFormData({ ...formData, budget: b })}
-                              className={`p-4 font-mono text-xs font-extrabold text-center border transition-all duration-300 cursor-pointer ${
-                                isSelected
-                                  ? "bg-[#2554E8] text-white border-[#2554E8]"
-                                  : "bg-white text-[#111827] border-black/10 hover:border-black/30"
-                              }`}
-                            >
-                              {b}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {/* Timeline Selector */}
-                    <div>
-                      <label className="block font-mono text-xs font-bold uppercase tracking-wider text-[#111827] mb-4">
-                        DESIRED LAUNCH TIMELINE
-                      </label>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                        {[
-                          "ASAP (Within 4 Weeks)",
-                          "1–2 Months",
-                          "Q4 2026 / Q1 2027",
-                          "Flexible / Exploratory",
-                        ].map((t) => {
-                          const isSelected = formData.timeline === t;
-
-                          return (
-                            <button
-                              type="button"
-                              key={t}
-                              onClick={() => setFormData({ ...formData, timeline: t })}
-                              className={`p-4 font-mono text-xs font-extrabold text-center border transition-all duration-300 cursor-pointer ${
-                                isSelected
-                                  ? "bg-[#111827] text-white border-[#111827]"
-                                  : "bg-white text-[#111827] border-black/10 hover:border-black/30"
-                              }`}
-                            >
-                              {t}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* QUESTION CONTAINER 05: Brief & Vision */}
-              {currentStep === 5 && (
-                <div className="space-y-8">
-                  <div className="flex items-center justify-between pb-6 border-b border-black/10">
-                    <div>
-                      <span className="font-mono text-xs font-bold text-[#2554E8] uppercase tracking-widest block mb-1">
-                        QUESTION 05 OF 05
-                      </span>
-                      <h3 className="font-sans font-black text-2xl sm:text-3xl text-[#111827] uppercase tracking-tight">
-                        PROJECT BRIEF & INSPIRATION
-                      </h3>
-                    </div>
-                    <FileText size={28} className="text-[#2554E8] hidden sm:block" />
-                  </div>
-
-                  <div className="space-y-6">
-                    <div>
-                      <label className="block font-mono text-xs font-bold uppercase tracking-wider text-[#111827] mb-2">
-                        PROJECT BRIEF & VISION NARRATIVE *
-                      </label>
-                      <textarea
-                        rows={5}
-                        required
-                        value={formData.projectOverview}
-                        onChange={(e) => setFormData({ ...formData, projectOverview: e.target.value })}
-                        placeholder="Please describe what you are building, key features required, bottlenecks, and your vision for success..."
-                        className="w-full px-5 py-4 bg-white border border-black/15 text-[#111827] placeholder:text-neutral-400 focus:outline-none focus:border-[#2554E8] text-sm font-medium resize-none"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block font-mono text-xs font-bold uppercase tracking-wider text-[#111827] mb-2">
-                        REFERENCE WEBSITES / BRANDS YOU ADMIRE (OPTIONAL)
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.referenceLinks}
-                        onChange={(e) => setFormData({ ...formData, referenceLinks: e.target.value })}
-                        placeholder="e.g. apple.com, stripe.com, Linear, Vercel..."
-                        className="w-full px-5 py-4 bg-white border border-black/15 text-[#111827] placeholder:text-neutral-400 focus:outline-none focus:border-[#2554E8] text-sm font-medium"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block font-mono text-xs font-bold uppercase tracking-wider text-[#111827] mb-2">
-                        HOW DID YOU HEAR ABOUT ONE NEXUS?
-                      </label>
-                      <select
-                        value={formData.referralSource}
-                        onChange={(e) => setFormData({ ...formData, referralSource: e.target.value })}
-                        className="w-full px-5 py-4 bg-white border border-black/15 text-[#111827] focus:outline-none focus:border-[#2554E8] text-sm font-bold"
-                      >
-                        <option value="Awwwards / Design Showcase">Awwwards / Design Showcase</option>
-                        <option value="Direct Founder Referral">Direct Founder Referral</option>
-                        <option value="LinkedIn / X (Twitter)">LinkedIn / X (Twitter)</option>
-                        <option value="Google Search">Google Search</option>
-                        <option value="Other / Industry Reputation">Other / Industry Reputation</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Step Action Buttons Footer */}
-              <div className="pt-8 border-t border-black/10 mt-10 flex items-center justify-between gap-4">
-                {currentStep > 1 ? (
-                  <button
-                    type="button"
-                    onClick={handlePrev}
-                    className="px-6 py-4 bg-white hover:bg-black/5 text-[#111827] font-mono text-xs font-bold uppercase tracking-widest border border-black/15 flex items-center gap-2 transition-colors cursor-pointer"
-                  >
-                    <ArrowLeft size={16} />
-                    <span>PREVIOUS STEP</span>
-                  </button>
-                ) : (
-                  <div />
-                )}
-
-                {currentStep < totalSteps ? (
-                  <button
-                    type="button"
-                    onClick={handleNext}
-                    className="px-8 py-4 bg-[#111827] hover:bg-[#2554E8] text-white font-mono text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-all duration-300 shadow-lg cursor-pointer"
-                  >
-                    <span>CONTINUE TO QUESTION 0{currentStep + 1}</span>
-                    <ArrowRight size={16} />
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={handleSubmit}
-                    disabled={isSubmitting}
-                    className="px-8 py-4 bg-[#2554E8] hover:bg-[#1d42c0] disabled:bg-[#2554E8]/60 text-white font-mono text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-all duration-300 shadow-xl cursor-pointer disabled:cursor-wait"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <span className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                        <span>TRANSMITTING DISCOVERY BRIEF...</span>
-                      </>
                     ) : (
-                      <>
-                        <Send size={16} />
-                        <span>TRANSMIT DISCOVERY BRIEF TO FOUNDERS</span>
-                        <ArrowUpRight size={16} />
-                      </>
+                      <p className="font-sans text-xs text-neutral-500 italic">
+                        No specific items pre-selected yet. Click any options below or fill out the details.
+                      </p>
                     )}
+
+                    {/* Quick Add Toggle Pills */}
+                    <div className="pt-2 border-t border-black/5">
+                      <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-neutral-400 block mb-2">
+                        + CLICK TO TOGGLE / ADD SERVICES & FOCUS AREAS:
+                      </span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {QUICK_SERVICE_OPTIONS.map((opt, idx) => {
+                          const isSel = selectedServices.includes(opt);
+                          return (
+                            <button
+                              type="button"
+                              key={idx}
+                              onClick={() => toggleService(opt)}
+                              className={`px-2.5 py-1 font-mono text-[10px] uppercase font-bold border transition-all ${
+                                isSel
+                                  ? "bg-[#2554E8] text-white border-[#2554E8]"
+                                  : "bg-neutral-100 hover:bg-white text-[#111827] border-black/10 hover:border-[#2554E8]"
+                              }`}
+                            >
+                              {isSel ? `✓ ${opt}` : `+ ${opt}`}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Section 1: Contact Details */}
+                  <div>
+                    <h3 className="font-mono text-xs font-extrabold text-[#2554E8] uppercase tracking-widest mb-6 flex items-center gap-2">
+                      <User size={16} />
+                      <span>1. YOUR CONTACT DETAILS</span>
+                    </h3>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block font-mono text-xs font-bold uppercase tracking-wider text-[#111827] mb-2">
+                          FULL NAME *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={formData.fullName}
+                          onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                          placeholder="e.g. Hemanth Kumar"
+                          className="w-full px-5 py-4 bg-white border border-black/15 text-[#111827] placeholder:text-neutral-400 focus:outline-none focus:border-[#2554E8] text-sm font-medium"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block font-mono text-xs font-bold uppercase tracking-wider text-[#111827] mb-2">
+                          EMAIL ADDRESS *
+                        </label>
+                        <input
+                          type="email"
+                          required
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          placeholder="e.g. name@example.com"
+                          className="w-full px-5 py-4 bg-white border border-black/15 text-[#111827] placeholder:text-neutral-400 focus:outline-none focus:border-[#2554E8] text-sm font-medium"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block font-mono text-xs font-bold uppercase tracking-wider text-[#111827] mb-2">
+                          MOBILE NUMBER *
+                        </label>
+                        <input
+                          type="tel"
+                          required
+                          value={formData.mobileNumber}
+                          onChange={(e) => setFormData({ ...formData, mobileNumber: e.target.value })}
+                          placeholder="e.g. +91 98765 43210"
+                          className="w-full px-5 py-4 bg-white border border-black/15 text-[#111827] placeholder:text-neutral-400 focus:outline-none focus:border-[#2554E8] text-sm font-medium"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block font-mono text-xs font-bold uppercase tracking-wider text-[#111827] mb-2">
+                          WHATSAPP NUMBER *
+                        </label>
+                        <input
+                          type="tel"
+                          required
+                          value={formData.whatsappNumber}
+                          onChange={(e) => setFormData({ ...formData, whatsappNumber: e.target.value })}
+                          placeholder="e.g. +91 98765 43210"
+                          className="w-full px-5 py-4 bg-white border border-black/15 text-[#111827] placeholder:text-neutral-400 focus:outline-none focus:border-[#2554E8] text-sm font-medium"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Section 2: Business & Service Details */}
+                  <div className="pt-6 border-t border-black/10">
+                    <h3 className="font-mono text-xs font-extrabold text-[#2554E8] uppercase tracking-widest mb-6 flex items-center gap-2">
+                      <Building2 size={16} />
+                      <span>2. BUSINESS & SERVICE REQUIREMENTS</span>
+                    </h3>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+                      <div>
+                        <label className="block font-mono text-xs font-bold uppercase tracking-wider text-[#111827] mb-2">
+                          BUSINESS NAME (OPTIONAL)
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.businessName}
+                          onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
+                          placeholder="e.g. Nexus Enterprises"
+                          className="w-full px-5 py-4 bg-white border border-black/15 text-[#111827] placeholder:text-neutral-400 focus:outline-none focus:border-[#2554E8] text-sm font-medium"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block font-mono text-xs font-bold uppercase tracking-wider text-[#111827] mb-2">
+                          BUSINESS TYPE *
+                        </label>
+                        <select
+                          value={formData.businessType}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              businessType: e.target.value as any,
+                            })
+                          }
+                          className="w-full px-5 py-4 bg-white border border-black/15 text-[#111827] focus:outline-none focus:border-[#2554E8] text-sm font-bold"
+                        >
+                          <option value="Planning to Start">Planning to Start</option>
+                          <option value="Existing Business">Existing Business</option>
+                        </select>
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="block font-mono text-xs font-bold uppercase tracking-wider text-[#111827] mb-2">
+                          SERVICE REQUIRED *
+                        </label>
+                        <select
+                          value={formData.serviceRequired}
+                          onChange={(e) => setFormData({ ...formData, serviceRequired: e.target.value })}
+                          className="w-full px-5 py-4 bg-white border border-black/15 text-[#111827] focus:outline-none focus:border-[#2554E8] text-sm font-bold"
+                        >
+                          <option value="AI Services">AI Services</option>
+                          <option value="Branding">Branding & Visual Identity</option>
+                          <option value="Social Media Marketing">Social Media Marketing</option>
+                          <option value="Website Design">Website Design & Craft</option>
+                          <option value="Digital Business Setup">
+                            Digital Business Setup (incl. Google Business Profile)
+                          </option>
+                          <option value="Monthly Growth Support">Monthly Growth Support</option>
+                          <option value="Complete Growth Package">Complete Digital Growth Package</option>
+                        </select>
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="block font-mono text-xs font-bold uppercase tracking-wider text-[#111827] mb-2">
+                          PREFERRED CONTACT TIME *
+                        </label>
+                        <select
+                          value={formData.preferredTime}
+                          onChange={(e) => setFormData({ ...formData, preferredTime: e.target.value })}
+                          className="w-full px-5 py-4 bg-white border border-black/15 text-[#111827] focus:outline-none focus:border-[#2554E8] text-sm font-bold"
+                        >
+                          <option value="Morning (9 AM - 12 PM)">Morning (9 AM - 12 PM)</option>
+                          <option value="Afternoon (12 PM - 4 PM)">Afternoon (12 PM - 4 PM)</option>
+                          <option value="Evening (4 PM - 8 PM)">Evening (4 PM - 8 PM)</option>
+                          <option value="Anytime">Anytime</option>
+                        </select>
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="block font-mono text-xs font-bold uppercase tracking-wider text-[#111827] mb-2">
+                          BUSINESS OR IDEA DETAILS *
+                        </label>
+                        <textarea
+                          rows={5}
+                          required
+                          value={formData.details}
+                          onChange={(e) => setFormData({ ...formData, details: e.target.value })}
+                          placeholder="Please share details about your business concept, target market, or what you hope to achieve..."
+                          className="w-full px-5 py-4 bg-white border border-black/15 text-[#111827] placeholder:text-neutral-400 focus:outline-none focus:border-[#2554E8] text-sm font-medium resize-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Submit Button */}
+                  <div className="pt-4 border-t border-black/10">
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full py-5 bg-[#2554E8] hover:bg-[#1d42c0] disabled:bg-[#2554E8]/60 text-white font-mono text-xs uppercase tracking-widest font-bold flex items-center justify-center gap-2 shadow-xl transition-all duration-300 hover:scale-[1.01] cursor-pointer"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <span className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                          <span>SUBMITTING ENQUIRY...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Send size={16} />
+                          <span>SUBMIT ENQUIRY</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+
+            {/* Right Column: Contact Information Card (4 cols) */}
+            <div className="lg:col-span-4 space-y-6">
+              <div className="p-8 bg-[#111827] text-white border border-black/10 shadow-xl space-y-8">
+                <div>
+                  <span className="font-mono text-xs text-[#2554E8] uppercase tracking-widest font-extrabold block mb-2">
+                    DIRECT CONTACT
+                  </span>
+                  <h3 className="font-sans font-black text-2xl uppercase tracking-tight mb-4">
+                    REACH ONENEXUS
+                  </h3>
+                  <p className="font-sans text-sm text-neutral-300 leading-relaxed">
+                    Have questions before submitting your enquiry? Connect with our team directly.
+                  </p>
+                </div>
+
+                {/* Email Info */}
+                <div className="pt-6 border-t border-white/10 space-y-2">
+                  <span className="font-mono text-[11px] text-neutral-400 uppercase tracking-widest block font-bold">
+                    OFFICIAL EMAIL
+                  </span>
+                  <a
+                    href="mailto:onenexus789@gmail.com"
+                    className="font-sans font-bold text-lg text-white hover:text-[#2554E8] transition-colors flex items-center gap-2"
+                  >
+                    <Mail size={18} className="text-[#2554E8]" />
+                    <span>onenexus789@gmail.com</span>
+                  </a>
+                  <button
+                    onClick={handleCopyEmail}
+                    className="mt-2 text-xs font-mono font-bold text-[#2554E8] hover:text-white flex items-center gap-1.5 transition-colors"
+                  >
+                    {copiedEmail ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                    <span>{copiedEmail ? "COPIED TO CLIPBOARD" : "COPY EMAIL"}</span>
                   </button>
-                )}
+                </div>
+
+                {/* Secondary Option: WhatsApp */}
+                <div className="pt-6 border-t border-white/10 space-y-2">
+                  <span className="font-mono text-[11px] text-neutral-400 uppercase tracking-widest block font-bold">
+                    WHATSAPP (SECONDARY OPTION)
+                  </span>
+                  <a
+                    href={getWhatsAppUrl("Hi OneNexus! I am on your contact page and would like to speak directly with senior leadership.")}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500 hover:text-white font-mono text-xs uppercase tracking-widest font-bold transition-all duration-300"
+                  >
+                    <MessageSquare size={16} />
+                    <span>CHAT ON WHATSAPP ↗</span>
+                  </a>
+                </div>
+
+                {/* Instagram & Social */}
+                <div className="pt-6 border-t border-white/10 space-y-2">
+                  <span className="font-mono text-[11px] text-neutral-400 uppercase tracking-widest block font-bold">
+                    INSTAGRAM & SOCIAL
+                  </span>
+                  <a
+                    href="https://instagram.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-sans text-sm text-neutral-300 hover:text-[#2554E8] flex items-center gap-2 transition-colors font-bold"
+                  >
+                    <InstagramIcon size={18} className="text-pink-500" />
+                    <span>Follow on Instagram ↗</span>
+                  </a>
+                </div>
+
+                {/* Official Website */}
+                <div className="pt-6 border-t border-white/10 space-y-1">
+                  <span className="font-mono text-[11px] text-neutral-400 uppercase tracking-widest block font-bold">
+                    OFFICIAL DOMAIN
+                  </span>
+                  <a
+                    href="https://onenexusdigi.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-sans font-black text-xl text-[#2554E8] hover:text-white transition-colors flex items-center gap-2"
+                  >
+                    <Globe size={18} />
+                    <span>onenexusdigi.com</span>
+                  </a>
+                </div>
               </div>
 
-            </div>
-          )}
-
-          {/* Bottom Direct Channels & Hub Info */}
-          <div className="mt-20 pt-14 border-t border-black/10 grid grid-cols-1 md:grid-cols-3 gap-8 font-mono text-xs">
-            {/* Direct Email */}
-            <div className="p-8 bg-[#F4F0EA]/90 border border-black/10 flex flex-col justify-between">
-              <div>
-                <span className="text-[#2554E8] font-bold block mb-2">DIRECT EMAIL</span>
-                <a href="mailto:hello@onenexus.studio" className="font-sans font-black text-xl text-[#111827] hover:text-[#2554E8] transition-colors">
-                  hello@onenexus.studio
-                </a>
-              </div>
-              <button
-                onClick={handleCopyEmail}
-                className="mt-6 py-3 px-4 bg-white hover:bg-neutral-50 text-[#111827] font-bold border border-black/10 flex items-center justify-center gap-2 transition-colors cursor-pointer"
-              >
-                {copied ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
-                <span>{copied ? "COPIED" : "COPY EMAIL ADDRESS"}</span>
-              </button>
-            </div>
-
-            {/* Global Studio Clocks */}
-            <div className="p-8 bg-[#F4F0EA]/90 border border-black/10 space-y-4">
-              <span className="text-[#2554E8] font-bold block mb-4">GLOBAL STUDIO CLOCKS</span>
-              <div className="flex justify-between border-b border-black/10 pb-2">
-                <span className="font-bold text-[#111827]">LONDON</span>
-                <span>{times.london} GMT</span>
-              </div>
-              <div className="flex justify-between border-b border-black/10 pb-2">
-                <span className="font-bold text-[#111827]">NEW YORK</span>
-                <span>{times.ny} EST</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-bold text-[#111827]">TOKYO</span>
-                <span>{times.tokyo} JST</span>
-              </div>
-            </div>
-
-            {/* Studio Guarantee */}
-            <div className="p-8 bg-[#F4F0EA]/90 border border-black/10 flex flex-col justify-between">
-              <div>
-                <span className="text-[#2554E8] font-bold block mb-2">STUDIO GUARANTEE</span>
-                <p className="font-sans text-xs text-[#475569] leading-relaxed">
-                  100% Senior partner attention on every project. Strict NDA compliance and full intellectual property transfer guaranteed.
+              {/* Serving India Badge */}
+              <div className="p-6 bg-[#F4F0EA] border border-black/10 font-mono text-xs text-[#111827] space-y-2">
+                <span className="font-bold text-[#2554E8] block uppercase">
+                  🇮🇳 SERVING BUSINESSES ACROSS INDIA
+                </span>
+                <p className="text-[#475569]">
+                  Empowering small businesses, aspiring entrepreneurs, and women founders in all states and union territories.
                 </p>
               </div>
-              <div className="mt-4 text-[10px] text-neutral-500 font-bold uppercase">
-                ONE NEXUS STUDIO • MAYFAIR LONDON
-              </div>
             </div>
           </div>
-
         </main>
 
-        {/* Footer */}
-        <footer className="w-full bg-[#EFECE6] border-t border-black/10 py-8 px-4 sm:px-8 lg:px-12 font-mono text-xs text-neutral-500">
-          <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div>© 2026 oneNexus Studio. All rights reserved.</div>
-            <Link href="/" className="hover:text-[#111827] transition-colors font-bold">
-              RETURN TO HOMEPAGE ↗
-            </Link>
-          </div>
-        </footer>
+        <Footer />
       </div>
     </>
   );
