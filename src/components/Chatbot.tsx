@@ -59,15 +59,21 @@ export default function Chatbot() {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-scroll to bottom of conversation
+  // Auto-scroll to bottom of conversation without scrolling the parent window
   useEffect(() => {
-    if (isOpen) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (isOpen && messagesContainerRef.current) {
+      const container = messagesContainerRef.current;
+      requestAnimationFrame(() => {
+        container.scrollTo({
+          top: container.scrollHeight,
+          behavior: "smooth",
+        });
+      });
       inputRef.current?.focus();
     }
   }, [messages, isOpen]);
 
-  // Isolate chat scrolling from parent page & Lenis smooth scroll
+  // Isolate chat scrolling completely from parent page & Lenis smooth scroll
   useEffect(() => {
     const container = messagesContainerRef.current;
     if (!container || !isOpen) return;
@@ -75,11 +81,31 @@ export default function Chatbot() {
     const handleWheel = (e: WheelEvent) => {
       // Prevent wheel event from bubbling to window / Lenis
       e.stopPropagation();
+
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const isScrollable = scrollHeight > clientHeight;
+
+      if (!isScrollable) return;
+
+      const isAtTop = scrollTop <= 0 && e.deltaY < 0;
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1 && e.deltaY > 0;
+
+      // Prevent chaining to document / window scroll when hitting top or bottom
+      if (isAtTop || isAtBottom) {
+        e.preventDefault();
+      }
     };
 
-    container.addEventListener("wheel", handleWheel, { passive: true });
+    const handleTouchMove = (e: TouchEvent) => {
+      e.stopPropagation();
+    };
+
+    container.addEventListener("wheel", handleWheel, { passive: false });
+    container.addEventListener("touchmove", handleTouchMove, { passive: true });
+
     return () => {
       container.removeEventListener("wheel", handleWheel);
+      container.removeEventListener("touchmove", handleTouchMove);
     };
   }, [isOpen]);
 
@@ -220,11 +246,13 @@ export default function Chatbot() {
         <div
           id="nexus-chatbot-window"
           data-lenis-prevent="true"
-          className="fixed bottom-6 right-6 z-50 w-[94vw] sm:w-[460px] max-w-[480px] h-[600px] max-h-[84vh] bg-white border border-black/15 shadow-2xl rounded-none flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-300 overscroll-contain"
+          data-lenis-prevent-wheel="true"
+          data-lenis-prevent-touch="true"
+          className="fixed bottom-6 right-6 z-50 w-[94vw] sm:w-[460px] max-w-[480px] h-[600px] max-h-[84vh] bg-white border border-black/15 shadow-2xl rounded-none flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-300 overscroll-contain select-text"
           style={{ overscrollBehavior: "contain" }}
         >
           {/* Header */}
-          <div className="px-4 py-3.5 bg-[#111827] text-white border-b border-black/20 flex items-center justify-between">
+          <div className="shrink-0 px-4 py-3.5 bg-[#111827] text-white border-b border-black/20 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 bg-[#2554E8] text-white flex items-center justify-center rounded-none shadow-xs">
                 <Bot size={18} />
@@ -265,7 +293,7 @@ export default function Chatbot() {
           </div>
 
           {/* Direct WhatsApp Callout Banner inside Chat */}
-          <div className="px-3.5 py-2 bg-emerald-50 border-b border-emerald-200/60 flex items-center justify-between text-[11px] font-mono">
+          <div className="shrink-0 px-3.5 py-2 bg-emerald-50 border-b border-emerald-200/60 flex items-center justify-between text-[11px] font-mono">
             <span className="text-emerald-900 font-bold flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 bg-emerald-600 rounded-none" />
               DIRECT FOUNDER CHANNEL
@@ -284,10 +312,13 @@ export default function Chatbot() {
           <div
             ref={messagesContainerRef}
             data-lenis-prevent="true"
-            onWheel={(e) => e.stopPropagation()}
-            onTouchMove={(e) => e.stopPropagation()}
-            className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#FBF9F6] scrollbar-thin overscroll-contain"
-            style={{ overscrollBehavior: "contain", touchAction: "pan-y" }}
+            data-lenis-prevent-wheel="true"
+            data-lenis-prevent-touch="true"
+            className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4 bg-[#FBF9F6] overscroll-contain chat-messages-scroll select-text pointer-events-auto"
+            style={{
+              overscrollBehavior: "contain",
+              WebkitOverflowScrolling: "touch",
+            }}
           >
             {messages.map((msg) => {
               const isUser = msg.role === "user";
@@ -397,7 +428,7 @@ export default function Chatbot() {
               e.preventDefault();
               handleSendMessage();
             }}
-            className="p-2.5 bg-white border-t border-black/15 flex items-center gap-2"
+            className="shrink-0 p-2.5 bg-white border-t border-black/15 flex items-center gap-2"
           >
             <input
               ref={inputRef}

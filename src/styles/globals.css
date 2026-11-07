@@ -151,6 +151,33 @@ body.custom-cursor-active #nexus-chatbot-window [role="button"] {
   overscroll-behavior: contain !important;
 }
 
+/* Custom Executive Scrollbar for Chatbot Messages Feed */
+.chat-messages-scroll {
+  scrollbar-width: thin !important;
+  scrollbar-color: #2554E8 #F3F4F6 !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+.chat-messages-scroll::-webkit-scrollbar {
+  width: 6px !important;
+  display: block !important;
+}
+
+.chat-messages-scroll::-webkit-scrollbar-track {
+  background: #F3F4F6 !important;
+  border-left: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+.chat-messages-scroll::-webkit-scrollbar-thumb {
+  background: #2554E8 !important;
+  border-radius: 0px !important;
+}
+
+.chat-messages-scroll::-webkit-scrollbar-thumb:hover {
+  background: #111827 !important;
+}
+
+
 /* Accessibility: Prefers Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
   *,
