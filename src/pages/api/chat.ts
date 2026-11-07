@@ -111,10 +111,16 @@ OPERATIONAL ETHOS:
 • Contact Form (/contact): Structured multi-step project scope intake with budget tiers and timeline selection.
 
 ==================================================
-8. RESPONSE GUIDELINES
+8. RESPONSE GUIDELINES & RICH FORMATTING SUPERPOWERS
 ==================================================
 • Persona: Nexus AI — sharp, articulate, energetic, authoritative, and helpful.
-• Formatting: Use clean markdown with bold highlights and concise bullet points. Keep answers punchy (2-4 brief paragraphs or lists).
+• The Chat UI features custom executive visual rendering:
+  - Section Headings: Use '### Heading' for sections (renders as an executive stylized header with a cobalt indicator).
+  - Point Cards: Use numbered points '1. **Title:** Description' (each renders as an individual point card with a numeric badge).
+  - Comparative Tables: Use markdown tables '| Column 1 | Column 2 | Column 3 |' when comparing plans, deliverables, SLAs, or timelines (renders as a responsive data grid).
+  - Highlight Boxes: Use blockquotes '> Important takeaway or guarantee' (renders as a highlighted alert card).
+  - Dividers: Use '---' to separate major sections.
+• Structure answers with clean cards, headings, and tables so answers look executive and easy to scan.
 • Pricing Inquiries: Emphasize that our pricing is transparent and requirement-based with upfront itemized quotes. Encourage chatting directly with senior leadership on WhatsApp or submitting the inquiry form at /contact for an instant audit.
 • Always suggest 2-4 natural next steps for the user.`;
 
@@ -126,7 +132,15 @@ function getKnowledgeBaseResponse(userQuery: string): { reply: string; suggested
   if (/^(hi|hello|hey|hola|greetings|good morning|good evening|sup)/i.test(q)) {
     return {
       reply:
-        "Hello! Welcome to OneNexus Studio. I am **Nexus AI** — your digital growth advisor.\n\nWhether you need high-converting website design, distinct branding, monthly reels, custom AI automation, or a complete digital business setup across India, I am here to help. What ambition are you looking to launch or scale?",
+        "Hello! Welcome to OneNexus Studio. I am **Nexus AI** — your digital growth advisor.\n\n" +
+        "### How I Can Guide You\n\n" +
+        "1. **Bespoke Websites:** High-converting Next.js platforms launched in 7–14 days.\n" +
+        "2. **Branding & Visual Identity:** Distinct logo marks, color architecture, and guidelines.\n" +
+        "3. **Social Media Engine:** Monthly 4K vertical reels and managed publishing.\n" +
+        "4. **AI Automation:** Custom workflows that eliminate manual operational busywork.\n" +
+        "5. **Monthly Retainers:** Dedicated growth support with zero long-term lock-in.\n\n" +
+        "> **Direct Founder Attention:** Every engagement is directed by senior partners with guaranteed <24h SLAs.\n\n" +
+        "What ambition are you looking to launch or scale?",
       suggestedActions: [
         "What services do you offer?",
         "Who do you help?",
@@ -149,10 +163,16 @@ function getKnowledgeBaseResponse(userQuery: string): { reply: string; suggested
     return {
       reply:
         "OneNexus specifically empowers three core audience pillars across India and globally:\n\n" +
-        "1. **Small Businesses**: Established & local enterprises looking to transition online, dominate Google Maps/local search, and automate customer inquiry capture.\n" +
-        "2. **Aspiring Entrepreneurs**: Idea-stage founders transforming raw concepts into launch-ready digital products, distinct brand identities, and rapid market validation.\n" +
-        "3. **Women Entrepreneurs**: Founders and creators receiving a dedicated digital co-pilot for high-impact branding, social media expansion, and strategic advisory.\n\n" +
-        "Every client engagement is directed by senior partners with guaranteed <24h SLAs and zero junior hand-offs.",
+        "### The 3 Core Audience Pillars\n\n" +
+        "1. **Small Businesses:** Established & local enterprises looking to transition online, dominate Google Maps/local search, and automate customer inquiry capture.\n" +
+        "2. **Aspiring Entrepreneurs:** Idea-stage founders transforming raw concepts into launch-ready digital products, distinct brand identities, and rapid market validation.\n" +
+        "3. **Women Entrepreneurs:** Founders and creators receiving a dedicated digital co-pilot for high-impact branding, social media expansion, and strategic advisory.\n\n" +
+        "| Audience Pillar | Primary Focus | Key Outcome |\n" +
+        "| --- | --- | --- |\n" +
+        "| Small Businesses | Local SEO & Automations | Lower CAC & Inquiry Influx |\n" +
+        "| Aspiring Founders | Brand & Web Launch | Rapid 7-14 Day MVP Launch |\n" +
+        "| Women Leaders | Growth Stewardship | Long-Term Compounding Reach |\n\n" +
+        "> **Operational Guarantee:** Direct access to senior partners with guaranteed <24h SLAs and zero junior hand-offs.",
       suggestedActions: [
         "Explore Website Design",
         "See How We Work",
@@ -175,12 +195,18 @@ function getKnowledgeBaseResponse(userQuery: string): { reply: string; suggested
     return {
       reply:
         "We operate on a transparent **5-Stage Linear Methodology**:\n\n" +
-        "• **Step 01: Share Your Ambition (Discovery)** — Deep-dive audit into your business goals, target audience, and bottlenecks.\n" +
-        "• **Step 02: Analyze & Map Strategy (Research)** — Competitive landscape evaluation, market positioning, and a tailored growth roadmap.\n" +
-        "• **Step 03: Craft Brand & Website (Build)** — Distinct visual identity and high-converting Next.js web architecture.\n" +
-        "• **Step 04: Go Live Across Channels (Launch)** — Full deployment with sub-second speeds, verified SEO, and Google Business setup.\n" +
-        "• **Step 05: Continuous Monthly Growth (Scale)** — Ongoing weekly video drops, CRO audits, and retention workflows.\n\n" +
-        "Typical websites launch in **7–14 days** with continuous partner-level communication.",
+        "### 5-Stage Operational Methodology\n\n" +
+        "1. **Step 01: Share Your Ambition (Discovery)** — Deep-dive audit into your business goals, target audience, and commercial bottlenecks.\n" +
+        "2. **Step 02: Analyze & Map Strategy (Research)** — Competitive landscape evaluation, market positioning, and a tailored growth roadmap.\n" +
+        "3. **Step 03: Craft Brand & Website (Build)** — Distinct visual identity and high-converting Next.js web architecture.\n" +
+        "4. **Step 04: Go Live Across Channels (Launch)** — Full deployment with sub-second speeds, verified SEO, and Google Business setup.\n" +
+        "5. **Step 05: Continuous Monthly Growth (Scale)** — Ongoing weekly video drops, CRO audits, and retention workflows.\n\n" +
+        "| Phase | Deliverable | Typical Cadence |\n" +
+        "| --- | --- | --- |\n" +
+        "| Diagnostics | Strategic Growth Roadmap | Days 1 - 2 |\n" +
+        "| Design & Build | Full Production Web/Brand | Days 3 - 10 |\n" +
+        "| Launch & Verification | Deployment & SEO Verification | Days 11 - 14 |\n\n" +
+        "> **Velocity Guarantee:** Production websites launch in **7–14 days** with continuous partner-level communication.",
       suggestedActions: [
         "Discuss your project on WhatsApp",
         "Explore Monthly retainers",
@@ -201,11 +227,19 @@ function getKnowledgeBaseResponse(userQuery: string): { reply: string; suggested
     return {
       reply:
         "Here is why ambitious founders partner with **OneNexus** instead of bloated agencies or fragmented freelancers:\n\n" +
-        "• **Understand Before We Recommend**: Zero generic templates. Everything is customized to your exact commercial model.\n" +
-        "• **Direct Partner Access**: Direct WhatsApp & Slack access to senior leadership with guaranteed <24h response SLAs — zero junior delegation.\n" +
-        "• **Lean Solutions, High Impact**: Zero technical bloat or corporate runaround. We ship production-grade digital assets 3x faster.\n" +
-        "• **Conversion First**: Every pixel and copy hook is mathematically calibrated for customer acquisition and lower CAC.\n" +
-        "• **Zero Lock-In Retainers**: Flexible monthly growth support that scales up or down as your business expands.",
+        "### The OneNexus Advantage Matrix\n\n" +
+        "1. **Understand Before We Recommend:** Zero generic templates. Everything is customized to your exact commercial model.\n" +
+        "2. **Direct Partner Access:** Direct WhatsApp & Slack access to senior leadership with guaranteed <24h response SLAs — zero junior delegation.\n" +
+        "3. **Lean Solutions, High Impact:** Zero technical bloat or corporate runaround. We ship production-grade digital assets 3x faster.\n" +
+        "4. **Conversion First:** Every pixel and copy hook is mathematically calibrated for customer acquisition and lower CAC.\n" +
+        "5. **Zero Lock-In Retainers:** Flexible monthly growth support that scales up or down as your business expands.\n\n" +
+        "| Metric | Traditional Agency | Freelancer | OneNexus Studio |\n" +
+        "| --- | --- | --- | --- |\n" +
+        "| Team Seniority | Junior Delegation | Single Skillset | 100% Senior Partners |\n" +
+        "| Response SLA | 48 - 72 Hours | Unreliable | Guaranteed < 24 Hours |\n" +
+        "| Contracts | 6 - 12 Month Lock-In | Hourly Scope Creep | 0 Lock-In (Monthly) |\n" +
+        "| Performance | Aesthetic Vanity | Code or Design only | Conversion & Revenue |\n\n" +
+        "> **Senior Partner Pledge:** We measure success on your balance sheet and customer velocity, not agency awards.",
       suggestedActions: [
         "Chat with leadership on WhatsApp",
         "View Services Overview",
@@ -228,8 +262,17 @@ function getKnowledgeBaseResponse(userQuery: string): { reply: string; suggested
     return {
       reply:
         "At OneNexus, we adhere strictly to: **Understand Before We Recommend**.\n\n" +
-        "We never push rigid, pre-packaged retainers with hidden fees. Our pricing is **modular and requirement-based** — whether you need a one-time high-converting website launch, complete visual branding, Google Business setup, or an ongoing monthly growth retainer.\n\n" +
-        "We provide transparent, itemized quotes upfront. Would you like a complimentary growth audit and bespoke project estimate? Connect directly with leadership on WhatsApp for an immediate assessment.",
+        "### Transparent Requirement-Based Pricing\n\n" +
+        "We never push rigid, pre-packaged retainers with hidden fees. Our pricing is **modular and requirement-based**:\n\n" +
+        "1. **Bespoke Websites:** Priced transparently on scope, custom features, and timeline (launched in 7-14 days).\n" +
+        "2. **Branding & Visual Craft:** Modular packages for logo marks, typography, and complete guideline manuals.\n" +
+        "3. **Ongoing Retainers:** Monthly agreements with zero lock-in contracts — scale or pause anytime.\n\n" +
+        "| Service | Engagement Model | Typical Turnaround |\n" +
+        "| --- | --- | --- |\n" +
+        "| High-Converting Website | Fixed Milestone Quote | 7 - 14 Days |\n" +
+        "| Visual Identity & Brand | Fixed Milestone Quote | 5 - 10 Days |\n" +
+        "| Monthly Growth Retainer | Zero Lock-in (Monthly) | Immediate Start |\n\n" +
+        "> **Free Audit:** We provide itemized quotes upfront after diagnosing your unit economics. Connect directly with leadership on WhatsApp for an immediate assessment.",
       suggestedActions: [
         "Get instant quote on WhatsApp",
         "Explore Monthly Growth retainers",
@@ -249,13 +292,23 @@ function getKnowledgeBaseResponse(userQuery: string): { reply: string; suggested
   ) {
     return {
       reply:
-        "Our **Ongoing Partnership Engine** delivers sustained brand momentum without in-house hiring overhead:\n\n" +
-        "• **Video Overviews & Reels Engine**: 8-12 custom 4K vertical reels/shorts per month with dynamic subtitles, motion cuts, and trend audio.\n" +
-        "• **Full-Service Profile Management**: Daily posting timetables, strategic hashtag clusters, and community DM lead routing.\n" +
-        "• **Real-Time Telemetry & CRO Audits**: Heatmaps, checkout funnel tuning, and A/B split-tests (+38.4% average conversion lift).\n" +
-        "• **Campaign Scaling & Offer Architecture**: High-ticket launch blueprints and bi-weekly senior advisory calls (4.2x target ROAS).\n" +
-        "• **Omnichannel Retention**: Automated email onboarding sequences and automated 5-star review collection engines.\n\n" +
-        "All monthly plans feature **zero long-term lock-ins** — cancel, pause, or scale anytime.",
+        "At **OneNexus Studio**, our monthly retainers operate as an adaptable, high-impact **Ongoing Partnership Engine** engineered to drive continuous commercial ROI—without trapping you in corporate bureaucracy.\n\n" +
+        "Unlike traditional agencies that demand rigid 6-to-12-month contracts, our retainers are **100% modular with zero long-term lock-ins**. You can scale up, pause, or adjust your active modules month-to-month as your business evolves.\n\n" +
+        "---\n\n" +
+        "### The 5 Modular Retainer Pillars\n\n" +
+        "You can stack or mix-and-match any of our core ongoing growth modules:\n\n" +
+        "1. **Short-Form Video & Reels Engine:** 8-12 bespoke 4K short-form videos/reels monthly featuring high-retention cuts, motion typography, viral hooks, and trend audio synchronization.\n" +
+        "2. **Full-Service Profile Management:** Timetable scheduling matched to peak audience engagement windows, hashtag clustering, grid harmony, and active community DM lead routing.\n" +
+        "3. **Real-Time Telemetry & CRO Audits:** Live user heatmaps, checkout funnel tuning, and empirical A/B split-testing sprints (+38.4% average conversion lift).\n" +
+        "4. **Campaign Scaling & Offer Architecture:** High-ticket launch blueprints, rapid promotional landing pages, and bi-weekly senior advisory calls (4.2x target ROAS).\n" +
+        "5. **Omnichannel Retention & Automated Nurture:** Automated email onboarding sequences, verified 5-star review collection engines, and customer LTV maximization.\n\n" +
+        "| Module | Cadence | Key Deliverables |\n" +
+        "| --- | --- | --- |\n" +
+        "| Reels Engine | Weekly Releases | 8 - 12 Custom 4K Reels & Shorts |\n" +
+        "| Profile Ops | Daily Active | Timetable Publishing & DM Routing |\n" +
+        "| CRO Telemetry | Bi-Weekly Sprints | Heatmaps, Speed Audits & Form Tuning |\n" +
+        "| Campaign Scaling | Bi-Weekly Reviews | Launch Blueprints & Offer Tuning |\n\n" +
+        "> **Guaranteed Freedom:** All monthly plans feature zero lock-in contracts. Scale, pause, or cancel anytime as your business expands.",
       suggestedActions: [
         "Build a monthly plan on WhatsApp",
         "What services do you offer?",

@@ -9,8 +9,11 @@ import {
   Bot,
   User,
   Zap,
+  Copy,
+  Check,
 } from "lucide-react";
 import { getWhatsAppUrl } from "@/lib/whatsapp";
+import ChatFormattedReply from "./ChatFormattedReply";
 
 interface Message {
   id: string;
@@ -42,6 +45,15 @@ export default function Chatbot() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [hasUnread, setHasUnread] = useState(true);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const handleCopyMessage = (text: string, id: string) => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    }
+  };
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -208,7 +220,7 @@ export default function Chatbot() {
         <div
           id="nexus-chatbot-window"
           data-lenis-prevent="true"
-          className="fixed bottom-6 right-6 z-50 w-[92vw] sm:w-[420px] max-w-[440px] h-[580px] max-h-[82vh] bg-white border border-black/15 shadow-2xl rounded-none flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-300 overscroll-contain"
+          className="fixed bottom-6 right-6 z-50 w-[94vw] sm:w-[460px] max-w-[480px] h-[600px] max-h-[84vh] bg-white border border-black/15 shadow-2xl rounded-none flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-300 overscroll-contain"
           style={{ overscrollBehavior: "contain" }}
         >
           {/* Header */}
@@ -300,16 +312,49 @@ export default function Chatbot() {
                     <span>• {msg.timestamp}</span>
                   </div>
 
-                  {/* Message Bubble */}
-                  <div
-                    className={`p-3.5 text-xs font-sans max-w-[88%] rounded-none shadow-xs ${
-                      isUser
-                        ? "bg-[#2554E8] text-white"
-                        : "bg-white border border-black/10 text-neutral-800"
-                    }`}
-                  >
-                    {renderFormattedText(msg.content)}
-                  </div>
+                  {/* Message Bubble Container */}
+                  {isUser ? (
+                    <div className="p-3 text-xs font-sans max-w-[85%] rounded-none shadow-xs bg-[#2554E8] text-white">
+                      {msg.content}
+                    </div>
+                  ) : (
+                    <div className="w-full max-w-[96%] sm:max-w-[94%] bg-white border border-black/15 shadow-sm rounded-none overflow-hidden">
+                      {/* Executive Reply Box Header Bar */}
+                      <div className="px-3.5 py-1.5 bg-[#111827] text-white border-b border-black/15 flex items-center justify-between font-mono text-[9px]">
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-none bg-emerald-400 animate-pulse" />
+                          <span className="font-bold tracking-wider text-white">NEXUS AI ADVISOR</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleCopyMessage(msg.content, msg.id)}
+                            className="flex items-center gap-1 text-neutral-300 hover:text-white transition-colors cursor-pointer px-1.5 py-0.5 hover:bg-white/10 rounded-none"
+                            title="Copy reply text"
+                          >
+                            {copiedId === msg.id ? (
+                              <>
+                                <Check size={10} className="text-emerald-400" />
+                                <span className="text-emerald-400 font-bold">COPIED</span>
+                              </>
+                            ) : (
+                              <>
+                                <Copy size={10} />
+                                <span>COPY</span>
+                              </>
+                            )}
+                          </button>
+                          <span className="text-neutral-500">•</span>
+                          <span className="text-neutral-400">{msg.timestamp}</span>
+                        </div>
+                      </div>
+
+                      {/* Custom Formatted Reply Body (Headings, Tables, Point Cards, Callouts) */}
+                      <div className="p-3.5 sm:p-4 bg-white">
+                        <ChatFormattedReply content={msg.content} />
+                      </div>
+                    </div>
+                  )}
 
                   {/* Suggested Quick Action Chips on Assistant Messages */}
                   {!isUser && msg.suggestedActions && msg.suggestedActions.length > 0 && (
